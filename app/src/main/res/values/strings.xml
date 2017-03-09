@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Smart Display</string>
+    <string name="hint_username">username</string>
+    <string name="hint_password">password</string>
+    <bool name="isTablet">false</bool>
+    <string name="btnConnect">Test connection</string>
+    <string name="hint_server_address">Please enter server address</string>
+    <string name="hint_port">Please enter server port</string>
+</resources>

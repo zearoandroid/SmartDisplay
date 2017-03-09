@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">Smart Display</string>
+    <string name="hint_username">username</string>
+    <string name="hint_password">password</string>
+    <bool name="isTablet">true</bool>
+</resources>

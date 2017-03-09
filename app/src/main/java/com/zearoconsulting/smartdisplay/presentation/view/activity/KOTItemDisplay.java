@@ -148,6 +148,7 @@ public class KOTItemDisplay extends DMBaseActivity {
     }
 
     private void getTerminalKOTDetails(){
+        AppConstants.URL = AppConstants.kURLHttp+mAppManager.getServerAddress()+":"+mAppManager.getServerPort()+AppConstants.kURLServiceName+ AppConstants.kURLMethodApi;
         if (!NetworkUtil.getConnectivityStatusString().equals(AppConstants.NETWORK_FAILURE)) {
             try {
 
@@ -169,6 +170,7 @@ public class KOTItemDisplay extends DMBaseActivity {
     }
 
     private void updateKOTComplete(long kotNumber){
+        AppConstants.URL = AppConstants.kURLHttp+mAppManager.getServerAddress()+":"+mAppManager.getServerPort()+AppConstants.kURLServiceName+ AppConstants.kURLMethodApi;
         if (!NetworkUtil.getConnectivityStatusString().equals(AppConstants.NETWORK_FAILURE)) {
             try {
 

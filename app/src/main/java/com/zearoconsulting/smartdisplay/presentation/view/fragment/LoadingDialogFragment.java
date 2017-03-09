@@ -179,6 +179,8 @@ public class LoadingDialogFragment extends AbstractDialogFragment {
         this.progressWheel.spin();
         this.statusText.setText("Please wait");
 
+        AppConstants.URL = AppConstants.kURLHttp+mAppManager.getServerAddress()+":"+mAppManager.getServerPort()+AppConstants.kURLServiceName+ AppConstants.kURLMethodApi;
+
         retrieveTabletMenu();
     }
 

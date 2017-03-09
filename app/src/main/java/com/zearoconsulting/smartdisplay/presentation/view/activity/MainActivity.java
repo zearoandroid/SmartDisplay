@@ -25,6 +25,7 @@ import android.widget.Toast;
 import android.os.Message;
 import com.zearoconsulting.smartdisplay.R;
 import com.zearoconsulting.smartdisplay.domain.net.NetworkDataRequestThread;
+import com.zearoconsulting.smartdisplay.presentation.model.Product;
 import com.zearoconsulting.smartdisplay.presentation.model.Terminals;
 import com.zearoconsulting.smartdisplay.presentation.view.adapter.TerminalSpinner;
 import com.zearoconsulting.smartdisplay.presentation.view.component.ReboundListener;
@@ -215,6 +216,8 @@ public class MainActivity extends DMBaseActivity {
 
         mDBHelper.deleteKOTTable();
 
+        List<Product> productList = mDBHelper.getAllProduct(mAppManager.getClientID(),mAppManager.getOrgID());
+
         if(mEdtUserName.getText().toString().trim().equals("")){
             mEdtUserName.setError("Username should not be empty");
         }else if(mEdtUserPassword.getText().toString().trim().equals("")){
@@ -226,7 +229,7 @@ public class MainActivity extends DMBaseActivity {
             mAppManager.setUsername(username);
             mAppManager.setPassword(password);
             showLoading();
-        }else if(mTerminalList.size()!=0){
+        }else if(mTerminalList.size()!=0 && productList.size()!=0){
             mTerminalId = mTerminalList.get(mCurrentTerminalSelection).getTerminalId();
             authenticate();
         }else{
@@ -299,6 +302,7 @@ public class MainActivity extends DMBaseActivity {
     }
 
     private void authenticate(){
+        AppConstants.URL = AppConstants.kURLHttp+mAppManager.getServerAddress()+":"+mAppManager.getServerPort()+AppConstants.kURLServiceName+ AppConstants.kURLMethodApi;
         if (!NetworkUtil.getConnectivityStatusString().equals(AppConstants.NETWORK_FAILURE)) {
             try {
                 mProDlg.setMessage("Authenticating...");

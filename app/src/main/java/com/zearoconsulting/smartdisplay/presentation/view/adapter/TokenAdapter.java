@@ -15,6 +15,8 @@ import com.zearoconsulting.smartdisplay.presentation.model.KOTLineItems;
 import com.zearoconsulting.smartdisplay.presentation.model.Product;
 import com.zearoconsulting.smartdisplay.presentation.model.Tables;
 import com.zearoconsulting.smartdisplay.presentation.presenter.ITokenSelectedListener;
+import com.zearoconsulting.smartdisplay.presentation.view.activity.KOTItemDisplay;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -136,7 +138,11 @@ public class TokenAdapter extends RecyclerView.Adapter<TokenAdapter.TokenListRow
     public void selectedItem(int pos) {
         try {
             KOTHeader token = mKOTHeaderList.get(pos);
-            listener.OnTokenSelectedListener(token);
+
+            if (mContext instanceof KOTItemDisplay) {
+                ((KOTItemDisplay) mContext).updateKOTComplete(token.getKotNumber());
+            }
+            //listener.OnTokenSelectedListener(token);
         } catch (Exception e) {
             e.printStackTrace();
         }

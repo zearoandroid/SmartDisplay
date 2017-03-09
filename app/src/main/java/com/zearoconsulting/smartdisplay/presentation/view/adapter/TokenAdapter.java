@@ -139,6 +139,10 @@ public class TokenAdapter extends RecyclerView.Adapter<TokenAdapter.TokenListRow
         try {
             KOTHeader token = mKOTHeaderList.get(pos);
 
+            /*
+             * TokenListener not working so instanceof
+             * method implemented
+             */
             if (mContext instanceof KOTItemDisplay) {
                 ((KOTItemDisplay) mContext).updateKOTComplete(token.getKotNumber());
             }

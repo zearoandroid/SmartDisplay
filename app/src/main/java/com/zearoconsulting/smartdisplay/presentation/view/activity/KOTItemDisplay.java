@@ -123,7 +123,9 @@ public class KOTItemDisplay extends DMBaseActivity {
         //Every 10 seconds app should check the data of terminal
         runnable = new Runnable(){
             public void run() {
+
                 getTerminalKOTDetails(); // some action(s)
+
                 updateHandler.postDelayed(this, 10* 1000);
             }
         };
@@ -197,7 +199,11 @@ public class KOTItemDisplay extends DMBaseActivity {
     private void displayKOTData(){
 
         AppConstants.isKOTParsing = false;
-        mKOTHeaderList = mDBHelper.getKOTHeaders(mAppManager.getTerminalID());
+
+        if(mAppManager.getTerminalID()!=0)
+            mKOTHeaderList = mDBHelper.getKOTHeaders(mAppManager.getTerminalID());
+        else
+            mKOTHeaderList = mDBHelper.getAllCompletedKOTHeaders();
 
         if(mTokenAdapter == null && mKOTHeaderList.size()!=0){
             mTokenAdapter = new TokenAdapter(mContext, mDBHelper, mAppManager, mKOTHeaderList, mAppManager.getTerminalID());

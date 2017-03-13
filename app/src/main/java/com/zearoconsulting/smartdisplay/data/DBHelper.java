@@ -520,11 +520,17 @@ public class DBHelper extends SQLiteOpenHelper {
         try {
             Cursor cursor = db.rawQuery("select kotTerminalId, kotTerminalName,  kotTerminalIP from kotTerminals", null);
 
-            Terminals terminal1 = new Terminals();
+            /*Terminals terminal1 = new Terminals();
             terminal1.setTerminalId(0);
             terminal1.setTerminalName("All");
             terminal1.setTerminalIP("");
-            terminalsList.add(terminal1);
+            terminalsList.add(terminal1);*/
+
+            Terminals terminal2 = new Terminals();
+            terminal2.setTerminalId(0);
+            terminal2.setTerminalName("Completed List");
+            terminal2.setTerminalIP("");
+            terminalsList.add(terminal2);
 
             while (cursor.moveToNext()) {
                 terminal = new Terminals();
@@ -2447,6 +2453,46 @@ public class DBHelper extends SQLiteOpenHelper {
         try {
 
             cursor = db.rawQuery("select * from kotHeader where kotTerminalId='" + terminalId + "' ", null);
+
+
+            while (cursor.moveToNext()) {
+                kotHeader = new KOTHeader();
+
+                kotHeader.setTablesId(cursor.getLong(1));
+                kotHeader.setKotNumber(cursor.getLong(2));
+                kotHeader.setInvoiceNumber(cursor.getLong(3));
+                kotHeader.setTerminalId(cursor.getLong(4));
+                kotHeader.setTotalAmount(cursor.getDouble(5));
+                kotHeader.setOrderBy(cursor.getString(6));
+                kotHeader.setKotType(cursor.getString(7));
+                kotHeader.setOrderType(cursor.getString(8));
+                kotHeader.setIsKOT(cursor.getString(9));
+                kotHeader.setPrinted(cursor.getString(10));
+                kotHeader.setPosted(cursor.getString(11));
+                kotHeader.setSelected(cursor.getString(12));
+                kotHeader.setCreateTime(cursor.getLong(13));
+
+                kotHeaderList.add(kotHeader);
+            }
+            cursor.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            db.close();
+        }
+
+        return kotHeaderList;
+    }
+
+    public List<KOTHeader> getAllCompletedKOTHeaders() {
+        List<KOTHeader> kotHeaderList = new ArrayList<KOTHeader>();
+        KOTHeader kotHeader = null;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
+
+        try {
+
+            cursor = db.rawQuery("select * from kotHeader", null);
 
 
             while (cursor.moveToNext()) {

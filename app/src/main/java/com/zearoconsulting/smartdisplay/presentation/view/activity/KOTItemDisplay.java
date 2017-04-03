@@ -4,15 +4,27 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.media.RingtoneManager;
+import android.media.ToneGenerator;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.zearoconsulting.smartdisplay.R;
@@ -20,6 +32,7 @@ import com.zearoconsulting.smartdisplay.domain.net.NetworkDataRequestThread;
 import com.zearoconsulting.smartdisplay.presentation.model.KOTHeader;
 import com.zearoconsulting.smartdisplay.presentation.presenter.ITokenSelectedListener;
 import com.zearoconsulting.smartdisplay.presentation.view.adapter.TokenAdapter;
+import com.zearoconsulting.smartdisplay.presentation.view.component.GridSpacingItemDecoration;
 import com.zearoconsulting.smartdisplay.presentation.view.dialogs.NetworkErrorDialog;
 import com.zearoconsulting.smartdisplay.utils.AppConstants;
 import com.zearoconsulting.smartdisplay.utils.NetworkUtil;
@@ -36,9 +49,10 @@ public class KOTItemDisplay extends DMBaseActivity {
     List<KOTHeader> mKOTHeaderList;
     private StaggeredGridLayoutManager mStagGridManager;
     private DefaultItemAnimator animator;
-
+    private Menu optionsMenu;
     Handler updateHandler = new Handler();
     Runnable runnable;
+    ToneGenerator mToneGen;
 
     private TokenAdapter mTokenAdapter = null;
 
@@ -62,6 +76,9 @@ public class KOTItemDisplay extends DMBaseActivity {
                     break;
                 case AppConstants.POST_TERMINAL_KOT_FLAGS:
                     mParser.parseKOTResponse(jsonStr,mHandler);
+                    break;
+                case AppConstants.POST_DELIVERED_KOT_FLAGS:
+                    mParser.parseKOTDeliveredResponse(jsonStr,mHandler);
                     break;
                 case AppConstants.POST_KOT_DATA_RESPONSE:
                     mProDlg.dismiss();
@@ -92,6 +109,8 @@ public class KOTItemDisplay extends DMBaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_kotitem_display);
 
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
         mContext = this;
         animator = new DefaultItemAnimator();
 
@@ -99,6 +118,11 @@ public class KOTItemDisplay extends DMBaseActivity {
         mTokensView.setHasFixedSize(true);
         mStagGridManager = new StaggeredGridLayoutManager(4, 1);
         mTokensView.setLayoutManager(mStagGridManager);
+
+        int spanCount =4;
+        int spacing = 10;
+        boolean includeEdge = true;
+        mTokensView.addItemDecoration(new GridSpacingItemDecoration(spanCount, spacing, includeEdge));
 
         animator.setRemoveDuration(1000);
         mTokensView.setItemAnimator(animator);
@@ -119,6 +143,9 @@ public class KOTItemDisplay extends DMBaseActivity {
         mProDlg = new ProgressDialog(this);
         mProDlg.setIndeterminate(true);
         mProDlg.setCancelable(false);
+
+        mToneGen = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100);
+
 
         //Every 10 seconds app should check the data of terminal
         runnable = new Runnable(){
@@ -196,6 +223,31 @@ public class KOTItemDisplay extends DMBaseActivity {
         }
     }
 
+    public void updateKOTDelivered(long kotNumber){
+        AppConstants.URL = AppConstants.kURLHttp+mAppManager.getServerAddress()+":"+mAppManager.getServerPort()+AppConstants.kURLServiceName+ AppConstants.kURLMethodApi;
+        if (!NetworkUtil.getConnectivityStatusString().equals(AppConstants.NETWORK_FAILURE)) {
+            try {
+
+                mProDlg.setMessage("Posting kot status...");
+                mProDlg.show();
+
+                JSONObject mJsonObj = mParser.getParams(AppConstants.POST_DELIVERED_KOT_FLAGS);
+                mJsonObj.put("terminalId", mAppManager.getTerminalID());
+                mJsonObj.put("KOTNumber", kotNumber);
+
+                Log.i("KOTJson", mJsonObj.toString());
+
+                NetworkDataRequestThread thread = new NetworkDataRequestThread(AppConstants.URL, "", mHandler, mJsonObj.toString(), AppConstants.POST_DELIVERED_KOT_FLAGS);
+                thread.start();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            //show network failure dialog or toast
+            NetworkErrorDialog.buildDialog(KOTItemDisplay.this).show();
+        }
+    }
+
     private void displayKOTData(){
 
         AppConstants.isKOTParsing = false;
@@ -209,10 +261,25 @@ public class KOTItemDisplay extends DMBaseActivity {
             mTokenAdapter = new TokenAdapter(mContext, mDBHelper, mAppManager, mKOTHeaderList, mAppManager.getTerminalID());
             mTokensView.setAdapter(mTokenAdapter);
             mTokenAdapter.notifyDataSetChanged();
+
+            //mToneGen.startTone(ToneGenerator.TONE_CDMA_ONE_MIN_BEEP);
+
+            Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            MediaPlayer mp = MediaPlayer.create(getApplicationContext(), notification);
+            mp.start();
+
         }else if(mKOTHeaderList.size() == 0){
             mTokensView.setAdapter(null);
             mTokenAdapter = null;
         }else{
+            List<KOTHeader> exitList = mTokenAdapter.getExistsTokenList();
+            if(exitList!=null){
+                if(mKOTHeaderList.size()>exitList.size()){
+                    Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+                    MediaPlayer mp = MediaPlayer.create(getApplicationContext(), notification);
+                    mp.start();
+                }
+            }
             mTokenAdapter.refresh(mKOTHeaderList);
             mTokenAdapter.notifyDataSetChanged();
         }
@@ -229,6 +296,26 @@ public class KOTItemDisplay extends DMBaseActivity {
         }
 
         super.onDestroy();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        this.optionsMenu = menu;
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_display, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_sync:
+                Intent mIntent = new Intent(KOTItemDisplay.this, ManualSyncActivity.class);
+                startActivity(mIntent);
+                finish();
+                return true;
+            default:
+                return false;
+        }
     }
 
     @Override

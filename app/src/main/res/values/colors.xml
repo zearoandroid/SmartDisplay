@@ -53,5 +53,6 @@
     <color name="mapColor">#048a8a</color>
     <color name="feedbackColor">#005757</color>
     <color name="transWhite">#80ffffff</color>
+    <color name="bgred">#FF0000</color>
 
 </resources>

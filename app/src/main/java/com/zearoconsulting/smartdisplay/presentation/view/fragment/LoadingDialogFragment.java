@@ -20,6 +20,7 @@ import com.zearoconsulting.smartdisplay.R;
 import com.zearoconsulting.smartdisplay.domain.net.NetworkDataRequestThread;
 import com.zearoconsulting.smartdisplay.presentation.view.activity.KOTItemDisplay;
 import com.zearoconsulting.smartdisplay.presentation.view.activity.MainActivity;
+import com.zearoconsulting.smartdisplay.presentation.view.activity.ManualSyncActivity;
 import com.zearoconsulting.smartdisplay.presentation.view.dialogs.NetworkErrorDialog;
 import com.zearoconsulting.smartdisplay.utils.AppConstants;
 import com.zearoconsulting.smartdisplay.utils.NetworkUtil;
@@ -35,7 +36,7 @@ public class LoadingDialogFragment extends AbstractDialogFragment {
 
 
     private static Context context;
-    private String username, password;
+    private String username, password, screen;
     private TextView statusText, progressText;
     private ProgressWheel progressWheel;
     private List<Long> mDefaultIdList;
@@ -63,7 +64,7 @@ public class LoadingDialogFragment extends AbstractDialogFragment {
                 case AppConstants.LOGIN_FAILURE:
                     progressWheel.stopSpinning();
                     Toast.makeText(context, "Invalid user name or password", Toast.LENGTH_SHORT).show();
-                    dismiss();
+                    dismissAllowingStateLoss();
                     break;
                 case AppConstants.GET_CASH_CUSTOMER_DATA:
                     mParser.parseCommonJson(jsonStr, mHandler);
@@ -72,7 +73,7 @@ public class LoadingDialogFragment extends AbstractDialogFragment {
                     if (mAppManager.getUserName().equalsIgnoreCase(username) && mDBHelper.getAllProduct(mAppManager.getClientID(),mAppManager.getOrgID()).size() != 0) {
                         mAppManager.setLoggedIn(true);
                         progressWheel.stopSpinning();
-                        dismiss();
+                        dismissAllowingStateLoss();
                     } else {
                         mDBHelper.deletePOSRelatedTables();
                         getTables();
@@ -102,22 +103,27 @@ public class LoadingDialogFragment extends AbstractDialogFragment {
                     break;
                 case AppConstants.PRODUCTS_RECEIVED:
                     mAppManager.setLoggedIn(true);
-                    dismiss();
-                    ((MainActivity) LoadingDialogFragment.this.getActivity()).updateTerminalSpinner();
+                    if (screen.equalsIgnoreCase("LOGIN")) {
+                        ((MainActivity) LoadingDialogFragment.this.getActivity()).updateTerminalSpinner();
+                    } else if (screen.equalsIgnoreCase("SYNC")) {
+                        Intent intent = new Intent(getActivity(), KOTItemDisplay.class);
+                        startActivity(intent);
+                    }
+                    dismissAllowingStateLoss();
                     break;
                 case AppConstants.NO_DATA_RECEIVED:
                     progressWheel.stopSpinning();
-                    dismiss();
+                    dismissAllowingStateLoss();
                     break;
                 case AppConstants.SERVER_ERROR:
                     progressWheel.stopSpinning();
                     Toast.makeText(context, "Server data error", Toast.LENGTH_SHORT).show();
-                    dismiss();
+                    dismissAllowingStateLoss();
                     break;
                 case AppConstants.DEVICE_NOT_REGISTERED:
                     progressWheel.stopSpinning();
                     Toast.makeText(context, "Device not registered to server!", Toast.LENGTH_SHORT).show();
-                    dismiss();
+                    dismissAllowingStateLoss();
                     break;
                 default:
                     break;
@@ -129,11 +135,12 @@ public class LoadingDialogFragment extends AbstractDialogFragment {
         // Required empty public constructor
     }
 
-    public static LoadingDialogFragment newInstance(Context paramContext, String paramString1, String paramString2) {
+    public static LoadingDialogFragment newInstance(Context paramContext, String paramString1, String paramString2, String paramString3) {
         LoadingDialogFragment localLoadingDialogFragment = new LoadingDialogFragment();
         Bundle localBundle = new Bundle();
         localBundle.putString("username", paramString1);
         localBundle.putString("password", paramString2);
+        localBundle.putString("screen", paramString3);
         localLoadingDialogFragment.setArguments(localBundle);
         context = paramContext;
         return localLoadingDialogFragment;
@@ -152,6 +159,7 @@ public class LoadingDialogFragment extends AbstractDialogFragment {
 
         this.username = getArguments().getString("username", "");
         this.password = getArguments().getString("password", "");
+        this.screen = getArguments().getString("screen", "");
 
         getDialog().getWindow().setSoftInputMode(3);
         getDialog().getWindow().requestFeature(1);
@@ -181,7 +189,11 @@ public class LoadingDialogFragment extends AbstractDialogFragment {
 
         AppConstants.URL = AppConstants.kURLHttp+mAppManager.getServerAddress()+":"+mAppManager.getServerPort()+AppConstants.kURLServiceName+ AppConstants.kURLMethodApi;
 
-        retrieveTabletMenu();
+        if (screen.equalsIgnoreCase("LOGIN")) {
+            retrieveTabletMenu();
+        } else if (screen.equalsIgnoreCase("SYNC")) {
+            getTables();
+        }
     }
 
     private void retrieveTabletMenu() {

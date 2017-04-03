@@ -144,6 +144,9 @@ public class JSONParser {
                 case AppConstants.POST_TERMINAL_KOT_FLAGS:
                     mJsonObj.put("operation", "updateTerminalKot");
                     break;
+                case AppConstants.POST_DELIVERED_KOT_FLAGS:
+                    mJsonObj.put("operation", "updateKotDelivered");
+                    break;
                 default:
                     break;
             }
@@ -701,6 +704,12 @@ public class JSONParser {
                             product.setPreparationTime("");
                         }
 
+                        if (obj.has("prTime")) {
+                            product.setPreparationTime(obj.getString("prTime"));
+                        } else {
+                            product.setPreparationTime("00:00");
+                        }
+
                         product.setClientId(mAppManager.getClientID());
                         product.setOrgId(mAppManager.getOrgID());
 
@@ -828,7 +837,7 @@ public class JSONParser {
                                 Date date = new Date(System.currentTimeMillis());
                                 long mCurrentTime = date.getTime();
 
-                                kotHeader.setCreateTime(mCurrentTime);
+                                kotHeader.setCreateTime(System.currentTimeMillis());
 
                                 //insert kot header data to db
                                 boolean inserted = mDBHelper.addKOTHeader(kotHeader);
@@ -859,6 +868,20 @@ public class JSONParser {
                                         product.setSalePrice(productObj.getDouble("sellingPrice"));
                                         product.setCostPrice(prod.getCostPrice());
                                         product.setTerminalId(terminalID);
+                                        product.setPreparationTime(prod.getPreparationTime());
+
+                                        long kotLineTime = 0;
+                                        if(prod.getPreparationTime().contains(":")) {
+                                            String[] units = product.getPreparationTime().split(":"); //will break the string up into an array
+                                            int hour = Integer.parseInt(units[0]); //first element
+                                            int minute = Integer.parseInt(units[1]); //second element
+
+                                            long hours = hour * 60 * 60 * 1000;
+                                            long minutes = minute * 60 * 1000;
+
+                                            kotLineTime = System.currentTimeMillis()+hours+minutes;
+
+                                        }
 
                                         qty = productObj.getInt("qty");
 
@@ -883,6 +906,10 @@ public class JSONParser {
                                         kotLineItems.setNotes(productObj.getString("description"));
                                         kotLineItems.setRefRowId(0);
                                         kotLineItems.setIsExtraProduct("N");
+                                        if(kotLineTime == 0)
+                                        kotLineItems.setCreateTime(System.currentTimeMillis());
+                                        else
+                                        kotLineItems.setCreateTime(kotLineTime);
 
                                         //insert kot line items
                                         mDBHelper.addKOTLineItems(kotLineItems, product, qty);
@@ -949,6 +976,20 @@ public class JSONParser {
                 product.setSalePrice(productObj.getDouble("sellingPrice"));
                 product.setCostPrice(prod.getCostPrice());
                 product.setTerminalId(terminalID);
+                product.setPreparationTime(prod.getPreparationTime());
+
+                long kotLineTime = 0;
+                if(prod.getPreparationTime().contains(":")) {
+                    String[] units = product.getPreparationTime().split(":"); //will break the string up into an array
+                    int hour = Integer.parseInt(units[0]); //first element
+                    int minute = Integer.parseInt(units[1]); //second element
+
+                    long hours = hour * 60 * 60 * 1000;
+                    long minutes = minute * 60 * 1000;
+
+                    kotLineTime = System.currentTimeMillis()+hours+minutes;
+
+                }
 
                 long kotLineId = productObj.getLong("KotLineID");
 
@@ -963,6 +1004,10 @@ public class JSONParser {
                 kotLineItems.setNotes(productObj.getString("description"));
                 kotLineItems.setRefRowId(refLineId);
                 kotLineItems.setIsExtraProduct("Y");
+                if(kotLineTime == 0)
+                    kotLineItems.setCreateTime(System.currentTimeMillis());
+                else
+                    kotLineItems.setCreateTime(kotLineTime);
 
                 //insert addOn kot line items
                 mDBHelper.addKOTLineItems(kotLineItems, product, productObj.getInt("qty"));
@@ -1008,6 +1053,34 @@ public class JSONParser {
     }
 
     public void parseKOTResponse(String jsonStr, Handler mHandler) {
+        Log.i("RESPONSE", jsonStr);
+        Message msg = new Message();
+        JSONObject json;
+        try {
+            json = new JSONObject(jsonStr);
+            if (json.getInt("responseCode") == 200) {
+                mDBHelper.deleteKOTTableData(json.getLong("KOTNumber"));
+                b.putInt("Type", AppConstants.POST_KOT_DATA_RESPONSE);
+                b.putString("OUTPUT", "");
+            }
+            else if (json.getInt("responseCode") == 301) {
+                b.putInt("Type", AppConstants.DEVICE_NOT_REGISTERED);
+                b.putString("OUTPUT", "");
+            } else {
+                b.putInt("Type", AppConstants.SERVER_ERROR);
+                b.putString("OUTPUT", "");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            b.putInt("Type", AppConstants.SERVER_ERROR);
+            b.putString("OUTPUT", "");
+        }
+
+        msg.setData(b);
+        mHandler.sendMessage(msg);
+    }
+
+    public void parseKOTDeliveredResponse(String jsonStr, Handler mHandler) {
         Log.i("RESPONSE", jsonStr);
         Message msg = new Message();
         JSONObject json;

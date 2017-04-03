@@ -277,7 +277,8 @@ public class DBHelper extends SQLiteOpenHelper {
             + " NUMERIC, " + KEY_KOT_LINE_ID + " NUMERIC, " + KEY_KOT_NUMBER + " NUMERIC, " + KEY_INVOICE_NUMBER + " NUMERIC, " + KEY_CATEGORY_ID + " NUMERIC, " + KEY_PRODUCT_ID + " NUMERIC, " + KEY_PRODUCT_NAME + " TEXT, "
             + KEY_PRODUCT_ARABIC_NAME + " TEXT, " + KEY_PRODUCT_VALE + " TEXT, " + KEY_PRODUCT_UOM_ID + " NUMERIC, " + KEY_PRODUCT_UOM_VALUE + " TEXT, "
             + KEY_PRODUCT_STD_PRICE + " NUMERIC, " + KEY_PRODUCT_COST_PRICE + " INTEGER, " + KEY_KOT_TERMINAL_ID + " NUMERIC, " + KEY_PRODUCT_QTY + " INTEGER, "
-            + KEY_PRODUCT_TOTAL_PRICE + " NUMERIC, " + KEY_KOT_ITEM_NOTES + " TEXT, " + KEY_IS_PRINTED + " TEXT," + KEY_IS_POSTED + " TEXT, " + KEY_KOT_REF_LINE_ID + " NUMERIC, " + KEY_KOT_EXTRA_PRODUCT + " TEXT);";
+            + KEY_PRODUCT_TOTAL_PRICE + " NUMERIC, " + KEY_KOT_ITEM_NOTES + " TEXT, " + KEY_IS_PRINTED + " TEXT," + KEY_IS_POSTED + " TEXT, " + KEY_KOT_REF_LINE_ID + " NUMERIC, " + KEY_KOT_EXTRA_PRODUCT + " TEXT, "
+            + KEY_CREATE_TIME + " NUMERIC," + KEY_PRODUCT_PREPARATION_TIME + " TEXT);";
 
 
     public DBHelper(Context context) {
@@ -2240,6 +2241,8 @@ public class DBHelper extends SQLiteOpenHelper {
             values.put(KEY_IS_POSTED, "N");
             values.put(KEY_KOT_REF_LINE_ID, kotLineItems.getRefRowId());
             values.put(KEY_KOT_EXTRA_PRODUCT, kotLineItems.getIsExtraProduct());
+            values.put(KEY_CREATE_TIME, kotLineItems.getCreateTime());
+            values.put(KEY_PRODUCT_PREPARATION_TIME, product.getPreparationTime());
 
             // Inserting Row
             db.insert(TABLE_KOT_LINES, null, values);
@@ -2684,7 +2687,6 @@ public class DBHelper extends SQLiteOpenHelper {
                 product.setCostPrice(cursor.getDouble(13));
                 product.setTerminalId(cursor.getLong(14));
 
-                kotLineItems.setProduct(product);
                 kotLineItems.setQty(cursor.getInt(15));
                 kotLineItems.setTotalPrice(cursor.getDouble(16));
                 kotLineItems.setNotes(cursor.getString(17));
@@ -2692,6 +2694,10 @@ public class DBHelper extends SQLiteOpenHelper {
                 kotLineItems.setStatus(cursor.getString(19));
                 kotLineItems.setRefRowId(cursor.getLong(20));
                 kotLineItems.setIsExtraProduct(cursor.getString(21));
+                kotLineItems.setCreateTime(cursor.getLong(22));
+
+                product.setPreparationTime(cursor.getString(23));
+                kotLineItems.setProduct(product);
 
                 kotLineItemList.add(kotLineItems);
             }
@@ -2703,6 +2709,26 @@ public class DBHelper extends SQLiteOpenHelper {
         }
 
         return kotLineItemList;
+    }
+
+    public long getKOTLineItemPreTime(long kotNumber){
+
+        long preTime = 0;
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        try {
+            Cursor mCursor = db.rawQuery("select MAX(createTime) from kotLineItems where kotNumber='" + kotNumber + "'", null);
+
+            while (mCursor.moveToNext()) {
+                preTime = mCursor.getLong(0);
+            }
+            mCursor.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            db.close();
+        }
+        return  preTime;
     }
 
     /**

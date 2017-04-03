@@ -1,11 +1,16 @@
 package com.zearoconsulting.smartdisplay.presentation.view.adapter;
 
 import android.content.Context;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.zearoconsulting.smartdisplay.R;
 import com.zearoconsulting.smartdisplay.data.AppDataManager;
@@ -33,7 +38,7 @@ public class TokenAdapter extends RecyclerView.Adapter<TokenAdapter.TokenListRow
     long mTerminalID;
     private AppDataManager mAppDataManager;
     private DBHelper mDBHelper;
-    SimpleDateFormat mDFormat = new SimpleDateFormat("dd-MM-yyyy hh:mm a");
+    SimpleDateFormat mDFormat = new SimpleDateFormat("dd-MM-yy hh:mm a");
 
     public TokenAdapter(Context context, DBHelper dbHelper, AppDataManager appDataManager, List<KOTHeader> kotHeaderList, long terminalId) {
         this.mKOTHeaderList = kotHeaderList;
@@ -72,31 +77,63 @@ public class TokenAdapter extends RecyclerView.Adapter<TokenAdapter.TokenListRow
 
         List<KOTLineItems> mKotItemList = mDBHelper.getKOTLineItem(kotHeader.getKotNumber());
 
+        long maxPreTime  = mDBHelper.getKOTLineItemPreTime(kotHeader.getKotNumber());
+        Date d2 = new Date(maxPreTime);
+        Date d1 = new Date(System.currentTimeMillis());
+        long diff = d2.getTime() - d1.getTime();
+        long diffMinutes = diff / (60 * 1000) % 60;
+        long diffHours = diff / (60 * 60 * 1000);
+
+        long diffTime = diffHours*60 + diffMinutes;
+
+        if(diffTime<=1){
+            holder.mView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.red));
+        }else{
+            holder.mView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.white));
+        }
+
         StringBuffer mStrProd = new StringBuffer();
         for(int i=0; i<mKotItemList.size(); i++){
 
             Product product = mKotItemList.get(i).getProduct();
             String desc = mKotItemList.get(i).getNotes();
             int qty = mKotItemList.get(i).getQty();
+            long insertTime = mKotItemList.get(i).getCreateTime();
 
-            if(!desc.equals("")){
-                mStrProd.append(qty+" "+product.getProdName()+"\n"+" "+desc+"\n");
+            Date d3 = new Date(insertTime);
+            Date d4 = new Date(System.currentTimeMillis());
+
+            long diff1 = d3.getTime() - d4.getTime();
+            long diffMinutes1 = diff1 / (60 * 1000) % 60;
+            long diffHours1 = diff1 / (60 * 60 * 1000);
+
+            long diffTime1 = diffHours1*60 + diffMinutes1;
+
+            if(diffTime1<=1){
+                //holder.txtProductsView.setTextColor(ContextCompat.getColor(mContext, R.color.red));
+
+                if(!desc.equals("")){
+                    mStrProd.append("<font COLOR=\'RED\'><b>" + qty +" "+product.getProdName()+"</b></font><br/>"+"<font COLOR=\'#00FF00\'><i>" + desc +"</i></font><br/><br/>");
+                }else{
+                    mStrProd.append("<font COLOR=\'RED\'><b>" + qty +" "+product.getProdName()+"\n"+"</b></font><br/><br/>");
+                }
+
             }else{
-                mStrProd.append(qty+" "+product.getProdName()+"\n"+"\n");
+
+                if(!desc.equals("")){
+                    mStrProd.append("<font><b>" +qty+" "+product.getProdName()+"</b></font><br/>"+"<font COLOR=\'#338AFF\'><i>"+desc+"</i></font><br/><br/>");
+                }else{
+                    mStrProd.append("<font><b>" +qty+" "+product.getProdName()+"</b></font><br/><br/>");
+                }
             }
         }
 
-        holder.txtProductsView.setText(mStrProd.toString());
+        holder.txtProductsView.setText(Html.fromHtml(mStrProd.toString()));
 
         if(mAppDataManager.getTerminalID()==0)
-            holder.btnKOTComplete.setVisibility(View.GONE);
+            holder.btnKOTComplete.setText("Order Delivered");
         else
-            holder.btnKOTComplete.setVisibility(View.VISIBLE);
-
-        /*TokenItemAdapter mTokenItemAdapter = new TokenItemAdapter(mKotItemList);
-        holder.tokenItemListView.setAdapter(mTokenItemAdapter);
-        mTokenItemAdapter.notifyDataSetChanged();
-        */
+            holder.btnKOTComplete.setText("Order Complete");
     }
 
     @Override
@@ -144,7 +181,11 @@ public class TokenAdapter extends RecyclerView.Adapter<TokenAdapter.TokenListRow
              * method implemented
              */
             if (mContext instanceof KOTItemDisplay) {
-                ((KOTItemDisplay) mContext).updateKOTComplete(token.getKotNumber());
+                if(mAppDataManager.getTerminalID()==0)
+                    ((KOTItemDisplay) mContext).updateKOTDelivered(token.getKotNumber());
+                else
+                    ((KOTItemDisplay) mContext).updateKOTComplete(token.getKotNumber());
+
             }
             //listener.OnTokenSelectedListener(token);
         } catch (Exception e) {
@@ -166,5 +207,9 @@ public class TokenAdapter extends RecyclerView.Adapter<TokenAdapter.TokenListRow
             }
             notifyDataSetChanged();
         }
+    }
+
+    public List<KOTHeader> getExistsTokenList(){
+        return mKOTHeaderList;
     }
 }

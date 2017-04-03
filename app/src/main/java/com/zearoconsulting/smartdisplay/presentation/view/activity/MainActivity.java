@@ -256,7 +256,7 @@ public class MainActivity extends DMBaseActivity {
             Toast.makeText(MainActivity.this,"Please config server details...",Toast.LENGTH_SHORT).show();
         }else{
             FragmentManager localFragmentManager = getSupportFragmentManager();
-            LoadingDialogFragment.newInstance(MainActivity.this, username, password).show(localFragmentManager, "loading");
+            LoadingDialogFragment.newInstance(MainActivity.this, username, password, "LOGIN").show(localFragmentManager, "loading");
         }
     }
 

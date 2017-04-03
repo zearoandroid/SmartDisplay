@@ -19,7 +19,7 @@ public class KOTLineItems implements Serializable {
     private String status;
     private long clientId;
     private long orgId;
-
+    private long createTime;
     private long kotLineId;
     private long refRowId;
     private String isExtraProduct;
@@ -135,5 +135,13 @@ public class KOTLineItems implements Serializable {
 
     public void setIsExtraProduct(String isExtraProduct) {
         this.isExtraProduct = isExtraProduct;
+    }
+
+    public long getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(long createTime) {
+        this.createTime = createTime;
     }
 }

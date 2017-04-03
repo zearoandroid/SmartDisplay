@@ -120,20 +120,22 @@ public class AppConstants {
 
     public static final int POST_TERMINAL_KOT_FLAGS = 37;
 
+    public static final int POST_DELIVERED_KOT_FLAGS = 38;
+
     /** response no data received key */
-    public static final int NO_DATA_RECEIVED = 38;
+    public static final int NO_DATA_RECEIVED = 39;
 
     /** response server error key */
-    public static final int SERVER_ERROR = 39;
+    public static final int SERVER_ERROR = 40;
 
     /** response network error key */
-    public static final int NETWORK_ERROR = 40;
+    public static final int NETWORK_ERROR = 41;
 
-    public static final int DEVICE_NOT_REGISTERED = 41;
+    public static final int DEVICE_NOT_REGISTERED = 42;
 
-    public static final int KOT_DATA_AVAILABLE = 42;
+    public static final int KOT_DATA_AVAILABLE = 43;
 
-    public static final int NO_KOT_DATA_AVAILABLE = 43;
+    public static final int NO_KOT_DATA_AVAILABLE = 44;
 
     /** notify response failure key */
     public static final String NETWORK_FAILURE = "Not connected to Internet";

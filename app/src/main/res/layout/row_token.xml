@@ -7,6 +7,7 @@
     android:layout_height="wrap_content"
     android:background="@color/white"
     card_view:cardCornerRadius="8dp"
+    card_view:cardPreventCornerOverlap="false"
     card_view:cardUseCompatPadding="true"
     tools:ignore="MissingPrefix">
 
@@ -92,7 +93,7 @@
             android:padding="10dp"
             android:textColor="@color/white"
             android:textSize="@dimen/kot_label_size"
-            android:background="@color/purple" />
+            android:background="#3C3547" />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/tokenItemListView"

@@ -11,6 +11,7 @@ import android.util.Log;
 import com.zearoconsulting.smartdisplay.AndroidApplication;
 import com.zearoconsulting.smartdisplay.R;
 import com.zearoconsulting.smartdisplay.data.AppDataManager;
+import com.zearoconsulting.smartdisplay.data.AppLog;
 import com.zearoconsulting.smartdisplay.data.DBHelper;
 import com.zearoconsulting.smartdisplay.presentation.model.BPartner;
 import com.zearoconsulting.smartdisplay.presentation.model.Category;
@@ -773,7 +774,12 @@ public class JSONParser {
         public void run() {
             try {
                 json = new JSONObject(mJsonStr);
+
+                AppLog.e("PARSER", "STARTED");
+
                 if (json.getInt("responseCode") == 200) {
+
+                    AppLog.e("PARSER", json.toString());
 
                     if(json.has("tables"))
                     jsonTableArray = json.getJSONArray("tables");
@@ -906,6 +912,7 @@ public class JSONParser {
                                         kotLineItems.setNotes(productObj.getString("description"));
                                         kotLineItems.setRefRowId(0);
                                         kotLineItems.setIsExtraProduct("N");
+                                        kotLineItems.setIsDeleted(productObj.getString("isDeleted"));
                                         if(kotLineTime == 0)
                                         kotLineItems.setCreateTime(System.currentTimeMillis());
                                         else
@@ -931,23 +938,40 @@ public class JSONParser {
                         }
                     }
 
+                    if(jsonTableArray==null && jsonTokenCompletedArray == null){
+                        mDBHelper.deleteKOTTable();
+                        AppLog.e("PARSER", "NO KOT AVAILABLE");
+                    }
+
                     b.putInt("Type", AppConstants.KOT_DATA_AVAILABLE);
                     b.putString("OUTPUT", "");
 
-                } else if (json.getInt("responseCode") == 601) {
+                } else if (json.getInt("responseCode") == 106) {
                     b.putInt("Type", AppConstants.NO_KOT_DATA_AVAILABLE);
                     b.putString("OUTPUT", "");
+                    mDBHelper.deleteKOTTable();
+                    AppLog.e("PARSER", "NO KOT AVAILABLE");
+
                 } else if (json.getInt("responseCode") == 301) {
                     b.putInt("Type", AppConstants.DEVICE_NOT_REGISTERED);
                     b.putString("OUTPUT", "");
+                } else{
+                    b.putInt("Type", AppConstants.SERVER_ERROR);
+                    b.putString("OUTPUT", "");
+
+                    AppLog.e("PARSER", "SERVER ERROR");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
                 b.putInt("Type", AppConstants.SERVER_ERROR);
                 b.putString("OUTPUT", "");
+
+                AppLog.e("PARSER", "SERVER ERROR");
+
             } finally {
                 msg.setData(b);
                 mHandler.sendMessage(msg);
+                AppLog.e("PARSER", "COMPLETED");
             }
         }
     }
@@ -1004,6 +1028,7 @@ public class JSONParser {
                 kotLineItems.setNotes(productObj.getString("description"));
                 kotLineItems.setRefRowId(refLineId);
                 kotLineItems.setIsExtraProduct("Y");
+                kotLineItems.setIsDeleted(productObj.getString("isDeleted"));
                 if(kotLineTime == 0)
                     kotLineItems.setCreateTime(System.currentTimeMillis());
                 else

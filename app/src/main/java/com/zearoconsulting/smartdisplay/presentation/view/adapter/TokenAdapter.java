@@ -60,80 +60,96 @@ public class TokenAdapter extends RecyclerView.Adapter<TokenAdapter.TokenListRow
     public void onBindViewHolder(TokenListRowHolder holder, int pos) {
 
         final KOTHeader kotHeader = mKOTHeaderList.get(pos);
-
-        holder.txtKOTNumView.setText("KOT: "+kotHeader.getKotNumber());
-
-        if(kotHeader.getTablesId() == 0){
-            holder.txtTableNameView.setText("CS"+kotHeader.getInvoiceNumber());
-        }else{
-            Tables tables =mDBHelper.getTableData(mAppDataManager.getClientID(),mAppDataManager.getOrgID(),kotHeader.getTablesId());
-            holder.txtTableNameView.setText("Table: "+tables.getTableName());
-        }
-
-        holder.txtOrderByView.setText("Order By: "+kotHeader.getOrderBy());
-
-        long mCreatedTime = kotHeader.getCreateTime();
-        holder.txtDateTimeView.setText(String.valueOf(mDFormat.format(new Date(mCreatedTime))));
-
         List<KOTLineItems> mKotItemList = mDBHelper.getKOTLineItem(kotHeader.getKotNumber());
+        if(mKotItemList.size()!=0){
 
-        long maxPreTime  = mDBHelper.getKOTLineItemPreTime(kotHeader.getKotNumber());
-        Date d2 = new Date(maxPreTime);
-        Date d1 = new Date(System.currentTimeMillis());
-        long diff = d2.getTime() - d1.getTime();
-        long diffMinutes = diff / (60 * 1000) % 60;
-        long diffHours = diff / (60 * 60 * 1000);
+            holder.txtKOTNumView.setText(String.valueOf(kotHeader.getKotNumber()));
 
-        long diffTime = diffHours*60 + diffMinutes;
-
-        if(diffTime<=1){
-            holder.mView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.red));
-        }else{
-            holder.mView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.white));
-        }
-
-        StringBuffer mStrProd = new StringBuffer();
-        for(int i=0; i<mKotItemList.size(); i++){
-
-            Product product = mKotItemList.get(i).getProduct();
-            String desc = mKotItemList.get(i).getNotes();
-            int qty = mKotItemList.get(i).getQty();
-            long insertTime = mKotItemList.get(i).getCreateTime();
-
-            Date d3 = new Date(insertTime);
-            Date d4 = new Date(System.currentTimeMillis());
-
-            long diff1 = d3.getTime() - d4.getTime();
-            long diffMinutes1 = diff1 / (60 * 1000) % 60;
-            long diffHours1 = diff1 / (60 * 60 * 1000);
-
-            long diffTime1 = diffHours1*60 + diffMinutes1;
-
-            if(diffTime1<=1){
-                //holder.txtProductsView.setTextColor(ContextCompat.getColor(mContext, R.color.red));
-
-                if(!desc.equals("")){
-                    mStrProd.append("<font COLOR=\'RED\'><b>" + qty +" "+product.getProdName()+"</b></font><br/>"+"<font COLOR=\'#00FF00\'><i>" + desc +"</i></font><br/><br/>");
-                }else{
-                    mStrProd.append("<font COLOR=\'RED\'><b>" + qty +" "+product.getProdName()+"\n"+"</b></font><br/><br/>");
-                }
-
+            if(kotHeader.getTablesId() == 0){
+                holder.txtTableNameView.setText("CS"+kotHeader.getInvoiceNumber());
             }else{
+                Tables tables =mDBHelper.getTableData(mAppDataManager.getClientID(),mAppDataManager.getOrgID(),kotHeader.getTablesId());
+                holder.txtTableNameView.setText(tables.getTableName());
+            }
 
-                if(!desc.equals("")){
-                    mStrProd.append("<font><b>" +qty+" "+product.getProdName()+"</b></font><br/>"+"<font COLOR=\'#338AFF\'><i>"+desc+"</i></font><br/><br/>");
+            holder.txtOrderByView.setText(kotHeader.getOrderBy());
+
+            long mCreatedTime = kotHeader.getCreateTime();
+            holder.txtDateTimeView.setText(String.valueOf(mDFormat.format(new Date(mCreatedTime))));
+
+
+
+            long maxPreTime  = mDBHelper.getKOTLineItemPreTime(kotHeader.getKotNumber());
+            Date d2 = new Date(maxPreTime);
+            Date d1 = new Date(System.currentTimeMillis());
+            long diff = d2.getTime() - d1.getTime();
+            long diffMinutes = diff / (60 * 1000) % 60;
+            long diffHours = diff / (60 * 60 * 1000);
+
+            long diffTime = diffHours*60 + diffMinutes;
+
+            if(diffTime<=1 && mAppDataManager.getTerminalID()!=0){
+                holder.mView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.red));
+            }else{
+                holder.mView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.white));
+            }
+
+            StringBuffer mStrProd = new StringBuffer();
+            for(int i=0; i<mKotItemList.size(); i++){
+
+                Product product = mKotItemList.get(i).getProduct();
+                String desc = mKotItemList.get(i).getNotes();
+                int qty = mKotItemList.get(i).getQty();
+                String isDeleted = mKotItemList.get(i).getIsDeleted();
+                long insertTime = mKotItemList.get(i).getCreateTime();
+
+                Date d3 = new Date(insertTime);
+                Date d4 = new Date(System.currentTimeMillis());
+
+                long diff1 = d3.getTime() - d4.getTime();
+                long diffMinutes1 = diff1 / (60 * 1000) % 60;
+                long diffHours1 = diff1 / (60 * 60 * 1000);
+
+                long diffTime1 = diffHours1*60 + diffMinutes1;
+
+                if(diffTime1<=1 && mAppDataManager.getTerminalID()!=0){
+                    //holder.txtProductsView.setTextColor(ContextCompat.getColor(mContext, R.color.red));
+                    if(!desc.equals("")){
+                        if(isDeleted.equalsIgnoreCase("Y"))
+                            mStrProd.append("<font COLOR=\'RED\'><b><strike>" + qty +" "+product.getProdName()+"</strike></b></font><br/>"+"<font COLOR=\'#00FF00\'><i><strike>" + desc +"</strike></i></font><br/><br/>");
+                        else
+                            mStrProd.append("<font COLOR=\'RED\'><b>" + qty +" "+product.getProdName()+"</b></font><br/>"+"<font COLOR=\'#00FF00\'><i>" + desc +"</i></font><br/><br/>");
+                    }else{
+                        if(isDeleted.equalsIgnoreCase("Y"))
+                            mStrProd.append("<font COLOR=\'RED\'><b><del>" + qty +" "+product.getProdName()+"\n"+"</del></b></font><br/><br/>");
+                        else
+                            mStrProd.append("<font COLOR=\'RED\'><b>" + qty +" "+product.getProdName()+"\n"+"</b></font><br/><br/>");
+                    }
+
                 }else{
-                    mStrProd.append("<font><b>" +qty+" "+product.getProdName()+"</b></font><br/><br/>");
+
+                    if(!desc.equals("")){
+                        if(isDeleted.equalsIgnoreCase("Y"))
+                            mStrProd.append("<font><b><strike>" +qty+" "+product.getProdName()+"<strike></b></font><br/>"+"<font COLOR=\'#338AFF\'><i><strike>"+desc+"<strike></i></font><br/><br/>");
+                        else
+                            mStrProd.append("<font><b>" +qty+" "+product.getProdName()+"</b></font><br/>"+"<font COLOR=\'#338AFF\'><i>"+desc+"</i></font><br/><br/>");
+                    }else{
+                        if(isDeleted.equalsIgnoreCase("Y"))
+                            mStrProd.append("<font><b><del>" +qty+" "+product.getProdName()+"</del></b></font><br/><br/>");
+                        else
+                            mStrProd.append("<font><b>" +qty+" "+product.getProdName()+"</b></font><br/><br/>");
+                    }
                 }
             }
+
+            holder.txtProductsView.setText(Html.fromHtml(mStrProd.toString()));
+
+            if(mAppDataManager.getTerminalID()==0)
+                holder.btnKOTComplete.setText("Order Delivered");
+            else
+                holder.btnKOTComplete.setText("Order Complete");
         }
 
-        holder.txtProductsView.setText(Html.fromHtml(mStrProd.toString()));
-
-        if(mAppDataManager.getTerminalID()==0)
-            holder.btnKOTComplete.setText("Order Delivered");
-        else
-            holder.btnKOTComplete.setText("Order Complete");
     }
 
     @Override

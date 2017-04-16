@@ -73,9 +73,10 @@ public class MainActivity extends DMBaseActivity {
                 case AppConstants.LOGIN_SUCCESS:
                     mProDlg.dismiss();
                     mAppManager.setTerminalID(mTerminalId);
-                    //goto intent
+                    mAppManager.setLoggedIn(true);
                     Intent intent = new Intent(MainActivity.this, KOTItemDisplay.class);
                     startActivity(intent);
+                    finish();
                     break;
                 case AppConstants.LOGIN_FAILURE:
                     mProDlg.dismiss();

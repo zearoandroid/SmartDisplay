@@ -28,8 +28,11 @@ import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.zearoconsulting.smartdisplay.R;
+import com.zearoconsulting.smartdisplay.data.AppLog;
 import com.zearoconsulting.smartdisplay.domain.net.NetworkDataRequestThread;
 import com.zearoconsulting.smartdisplay.presentation.model.KOTHeader;
+import com.zearoconsulting.smartdisplay.presentation.model.Terminals;
+import com.zearoconsulting.smartdisplay.presentation.presenter.ITokenDeletedListener;
 import com.zearoconsulting.smartdisplay.presentation.presenter.ITokenSelectedListener;
 import com.zearoconsulting.smartdisplay.presentation.view.adapter.TokenAdapter;
 import com.zearoconsulting.smartdisplay.presentation.view.component.GridSpacingItemDecoration;
@@ -42,7 +45,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.List;
 
-public class KOTItemDisplay extends DMBaseActivity {
+public class KOTItemDisplay extends DMBaseActivity implements ITokenDeletedListener.OnTokenDeletedListener {
 
     private Context mContext;
     private RecyclerView mTokensView;
@@ -73,6 +76,7 @@ public class KOTItemDisplay extends DMBaseActivity {
                     displayKOTData();
                     break;
                 case AppConstants.NO_KOT_DATA_AVAILABLE:
+                    AppConstants.isKOTParsing = true;
                     break;
                 case AppConstants.POST_TERMINAL_KOT_FLAGS:
                     mParser.parseKOTResponse(jsonStr,mHandler);
@@ -86,9 +90,13 @@ public class KOTItemDisplay extends DMBaseActivity {
                     break;
                 case AppConstants.NO_DATA_RECEIVED:
                     mProDlg.dismiss();
+                    AppConstants.isKOTParsing = true;
                     break;
                 case AppConstants.SERVER_ERROR:
-                    mProDlg.dismiss();
+                    AppConstants.isKOTParsing = true;
+                    if(mProDlg.isShowing())
+                        mProDlg.dismiss();
+
                     Toast.makeText(KOTItemDisplay.this,"Server data error",Toast.LENGTH_SHORT).show();
                     break;
                 default:
@@ -107,6 +115,14 @@ public class KOTItemDisplay extends DMBaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if(mAppManager.getTerminalID() == 0)
+            setTitle("Smart Display - Completed KOT");
+        else{
+            Terminals terminal = mDBHelper.getTerminalData(mAppManager.getClientID(),mAppManager.getOrgID(),mAppManager.getTerminalID());
+            setTitle("Smart Display - "+terminal.getTerminalName());
+        }
+
         setContentView(R.layout.activity_kotitem_display);
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -128,6 +144,8 @@ public class KOTItemDisplay extends DMBaseActivity {
         mTokensView.setItemAnimator(animator);
 
         AppConstants.URL = AppConstants.kURLHttp+mAppManager.getServerAddress()+":"+mAppManager.getServerPort()+AppConstants.kURLServiceName+ AppConstants.kURLMethodApi;
+
+        mDBHelper.deleteKOTTable();
 
         mKOTHeaderList = mDBHelper.getKOTHeaders(mAppManager.getTerminalID());
 
@@ -164,6 +182,10 @@ public class KOTItemDisplay extends DMBaseActivity {
     protected void onResume() {
         try {
             updateHandler.postDelayed(runnable, 5000);
+
+            //register the order state listener
+            ITokenDeletedListener.getInstance().setListener(this);
+
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -178,12 +200,12 @@ public class KOTItemDisplay extends DMBaseActivity {
 
     private void getTerminalKOTDetails(){
         AppConstants.URL = AppConstants.kURLHttp+mAppManager.getServerAddress()+":"+mAppManager.getServerPort()+AppConstants.kURLServiceName+ AppConstants.kURLMethodApi;
-        if (!NetworkUtil.getConnectivityStatusString().equals(AppConstants.NETWORK_FAILURE)) {
+        if (NetworkUtil.isOnline()) {
             try {
 
                 //mProDlg.setMessage("Getting tables status...");
                 //mProDlg.show();
-
+                AppLog.e("Internet Connection", "Good! Connected to Internet");
                 JSONObject mJsonObj = mParser.getParams(AppConstants.GET_KOT_HEADER_AND_lINES);
                 Log.i("KOTJson", mJsonObj.toString());
 
@@ -193,10 +215,38 @@ public class KOTItemDisplay extends DMBaseActivity {
                 e.printStackTrace();
             }
         } else {
+            AppLog.e("Internet Connection", "Sorry! Not connected to internet");
             //show network failure dialog or toast
-            NetworkErrorDialog.buildDialog(KOTItemDisplay.this).show();
+            showNetworkErrorDialog();
         }
     }
+
+    private void showNetworkErrorDialog() {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                mContext);
+
+        // set title
+        alertDialogBuilder.setTitle("Warning");
+
+        // set dialog message
+        alertDialogBuilder
+                .setMessage("Please Check Your Internet Connection!")
+                .setCancelable(false)
+                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // if this button is clicked, close
+                        // current activity
+                        dialog.cancel();
+                    }
+                });
+
+        // create alert dialog
+        AlertDialog alertDialog = alertDialogBuilder.create();
+
+        // show it
+        alertDialog.show();
+    }
+
 
     public void updateKOTComplete(long kotNumber){
         AppConstants.URL = AppConstants.kURLHttp+mAppManager.getServerAddress()+":"+mAppManager.getServerPort()+AppConstants.kURLServiceName+ AppConstants.kURLMethodApi;
@@ -219,7 +269,7 @@ public class KOTItemDisplay extends DMBaseActivity {
             }
         } else {
             //show network failure dialog or toast
-            NetworkErrorDialog.buildDialog(KOTItemDisplay.this).show();
+            showNetworkErrorDialog();
         }
     }
 
@@ -244,7 +294,7 @@ public class KOTItemDisplay extends DMBaseActivity {
             }
         } else {
             //show network failure dialog or toast
-            NetworkErrorDialog.buildDialog(KOTItemDisplay.this).show();
+            showNetworkErrorDialog();
         }
     }
 
@@ -313,6 +363,9 @@ public class KOTItemDisplay extends DMBaseActivity {
                 startActivity(mIntent);
                 finish();
                 return true;
+            case R.id.action_logout:
+                logout();
+                return true;
             default:
                 return false;
         }
@@ -337,6 +390,9 @@ public class KOTItemDisplay extends DMBaseActivity {
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
                 //AppConstants.posID = 0;
+                mAppManager.setLoggedIn(false);
+                Intent mIntent = new Intent(KOTItemDisplay.this, MainActivity.class);
+                startActivity(mIntent);
                 finish();
             }
         });
@@ -349,5 +405,12 @@ public class KOTItemDisplay extends DMBaseActivity {
         });
 
         alertDialog.show();
+    }
+
+    @Override
+    public void onTokenDeleted() {
+        Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        MediaPlayer mp = MediaPlayer.create(getApplicationContext(), notification);
+        mp.start();
     }
 }

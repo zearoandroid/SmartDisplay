@@ -28,7 +28,7 @@
                 android:layout_weight="1"
                 android:padding="5dp"
                 android:textSize="@dimen/kot_label_size"
-                android:text="KOT: 10078" />
+                android:text="" />
 
             <TextView
                 android:id="@+id/txtTableNameView"
@@ -41,7 +41,7 @@
                 android:paddingLeft="5dp"
                 android:paddingRight="20dp"
                 android:paddingTop="5dp"
-                android:text="Table: 18" />
+                android:text="" />
 
         </LinearLayout>
 
@@ -50,29 +50,24 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/headerView"
-            android:orientation="horizontal">
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/txtOrderByView"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:padding="5dp"
                 android:textSize="@dimen/kot_label_size"
-                android:text="KOT: 10078" />
+                android:text="" />
 
             <TextView
                 android:id="@+id/txtDateTimeView"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="right"
-                android:paddingBottom="5dp"
                 android:paddingLeft="5dp"
-                android:paddingRight="20dp"
                 android:paddingTop="5dp"
                 android:textSize="@dimen/kot_label_size"
-                android:text="Table: 18" />
+                android:text="" />
 
         </LinearLayout>
 

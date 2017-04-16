@@ -23,6 +23,7 @@ public class KOTLineItems implements Serializable {
     private long kotLineId;
     private long refRowId;
     private String isExtraProduct;
+    private String isDeleted;
 
     public long getKotLineId() {
         return kotLineId;
@@ -143,5 +144,13 @@ public class KOTLineItems implements Serializable {
 
     public void setCreateTime(long createTime) {
         this.createTime = createTime;
+    }
+
+    public String getIsDeleted() {
+        return isDeleted;
+    }
+
+    public void setIsDeleted(String deleted) {
+        this.isDeleted = deleted;
     }
 }

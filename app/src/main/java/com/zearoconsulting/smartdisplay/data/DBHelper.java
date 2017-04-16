@@ -21,6 +21,7 @@ import com.zearoconsulting.smartdisplay.presentation.model.Role;
 import com.zearoconsulting.smartdisplay.presentation.model.Tables;
 import com.zearoconsulting.smartdisplay.presentation.model.Terminals;
 import com.zearoconsulting.smartdisplay.presentation.model.Warehouse;
+import com.zearoconsulting.smartdisplay.presentation.presenter.ITokenDeletedListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -144,6 +145,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     private static final String KEY_IS_DEFAULT = "isDefault";
     private static final String KEY_IS_UPDATED = "isUpdated";
+    private static final String KEY_IS_DELETED = "isDeleted";
     private static final String KEY_IS_POSTED = "isPosted";
     private static final String KEY_IS_KOT = "isKOT";
     private static final String KEY_KOT_TYPE = "kotType";
@@ -278,7 +280,7 @@ public class DBHelper extends SQLiteOpenHelper {
             + KEY_PRODUCT_ARABIC_NAME + " TEXT, " + KEY_PRODUCT_VALE + " TEXT, " + KEY_PRODUCT_UOM_ID + " NUMERIC, " + KEY_PRODUCT_UOM_VALUE + " TEXT, "
             + KEY_PRODUCT_STD_PRICE + " NUMERIC, " + KEY_PRODUCT_COST_PRICE + " INTEGER, " + KEY_KOT_TERMINAL_ID + " NUMERIC, " + KEY_PRODUCT_QTY + " INTEGER, "
             + KEY_PRODUCT_TOTAL_PRICE + " NUMERIC, " + KEY_KOT_ITEM_NOTES + " TEXT, " + KEY_IS_PRINTED + " TEXT," + KEY_IS_POSTED + " TEXT, " + KEY_KOT_REF_LINE_ID + " NUMERIC, " + KEY_KOT_EXTRA_PRODUCT + " TEXT, "
-            + KEY_CREATE_TIME + " NUMERIC," + KEY_PRODUCT_PREPARATION_TIME + " TEXT);";
+            + KEY_CREATE_TIME + " NUMERIC," + KEY_PRODUCT_PREPARATION_TIME + " TEXT, " + KEY_IS_DELETED + " TEXT);";
 
 
     public DBHelper(Context context) {
@@ -594,6 +596,7 @@ public class DBHelper extends SQLiteOpenHelper {
             e.printStackTrace();
             inserted = false;
         } finally {
+            inserted = true;
             db.close(); // Closing database connection
         }
 
@@ -2215,37 +2218,67 @@ public class DBHelper extends SQLiteOpenHelper {
 
         try {
             double totalPrice = 0;
+            Cursor mCount = db.rawQuery("select kotLineId from kotLineItems where kotNumber='" + kotLineItems.getKotNumber() + "' and kotLineId = '" + kotLineItems.getKotLineId() + "' ", null);
+            //mCount.moveToFirst();
+            long kotLineId = -1;
 
-            ContentValues values = new ContentValues();
+            while (mCount.moveToNext()) {
+                kotLineId = mCount.getLong(0);
+            }
+            mCount.close();
 
-            values.put(KEY_KOT_TABLE_ID, kotLineItems.getTableId());
-            values.put(KEY_KOT_LINE_ID, kotLineItems.getKotLineId());
-            values.put(KEY_KOT_NUMBER, kotLineItems.getKotNumber());
-            values.put(KEY_INVOICE_NUMBER, kotLineItems.getInvoiceNumber());
-            values.put(KEY_CATEGORY_ID, product.getCategoryId());
-            values.put(KEY_PRODUCT_ID, product.getProdId());
-            values.put(KEY_PRODUCT_NAME, product.getProdName());
-            values.put(KEY_PRODUCT_ARABIC_NAME, product.getProdArabicName());
-            values.put(KEY_PRODUCT_VALE, product.getProdValue());
-            values.put(KEY_PRODUCT_UOM_ID, product.getUomId());
-            values.put(KEY_PRODUCT_UOM_VALUE, product.getUomValue());
-            values.put(KEY_PRODUCT_STD_PRICE, product.getSalePrice());
-            values.put(KEY_PRODUCT_COST_PRICE, product.getCostPrice());
-            values.put(KEY_KOT_TERMINAL_ID, product.getTerminalId());
+            if (kotLineId == -1) {
+                ContentValues values = new ContentValues();
 
-            values.put(KEY_PRODUCT_QTY, qty);
-            totalPrice = qty * product.getSalePrice();
-            values.put(KEY_PRODUCT_TOTAL_PRICE, totalPrice);
-            values.put(KEY_KOT_ITEM_NOTES, kotLineItems.getNotes());
-            values.put(KEY_IS_PRINTED, "N");
-            values.put(KEY_IS_POSTED, "N");
-            values.put(KEY_KOT_REF_LINE_ID, kotLineItems.getRefRowId());
-            values.put(KEY_KOT_EXTRA_PRODUCT, kotLineItems.getIsExtraProduct());
-            values.put(KEY_CREATE_TIME, kotLineItems.getCreateTime());
-            values.put(KEY_PRODUCT_PREPARATION_TIME, product.getPreparationTime());
+                values.put(KEY_KOT_TABLE_ID, kotLineItems.getTableId());
+                values.put(KEY_KOT_LINE_ID, kotLineItems.getKotLineId());
+                values.put(KEY_KOT_NUMBER, kotLineItems.getKotNumber());
+                values.put(KEY_INVOICE_NUMBER, kotLineItems.getInvoiceNumber());
+                values.put(KEY_CATEGORY_ID, product.getCategoryId());
+                values.put(KEY_PRODUCT_ID, product.getProdId());
+                values.put(KEY_PRODUCT_NAME, product.getProdName());
+                values.put(KEY_PRODUCT_ARABIC_NAME, product.getProdArabicName());
+                values.put(KEY_PRODUCT_VALE, product.getProdValue());
+                values.put(KEY_PRODUCT_UOM_ID, product.getUomId());
+                values.put(KEY_PRODUCT_UOM_VALUE, product.getUomValue());
+                values.put(KEY_PRODUCT_STD_PRICE, product.getSalePrice());
+                values.put(KEY_PRODUCT_COST_PRICE, product.getCostPrice());
+                values.put(KEY_KOT_TERMINAL_ID, product.getTerminalId());
 
-            // Inserting Row
-            db.insert(TABLE_KOT_LINES, null, values);
+                values.put(KEY_PRODUCT_QTY, qty);
+                totalPrice = qty * product.getSalePrice();
+                values.put(KEY_PRODUCT_TOTAL_PRICE, totalPrice);
+                values.put(KEY_KOT_ITEM_NOTES, kotLineItems.getNotes());
+                values.put(KEY_IS_PRINTED, "N");
+                values.put(KEY_IS_POSTED, "N");
+                values.put(KEY_KOT_REF_LINE_ID, kotLineItems.getRefRowId());
+                values.put(KEY_KOT_EXTRA_PRODUCT, kotLineItems.getIsExtraProduct());
+                values.put(KEY_CREATE_TIME, kotLineItems.getCreateTime());
+                values.put(KEY_PRODUCT_PREPARATION_TIME, product.getPreparationTime());
+                values.put(KEY_IS_DELETED, kotLineItems.getIsDeleted());
+
+                // Inserting Row
+                db.insert(TABLE_KOT_LINES, null, values);
+            }else{
+
+                Cursor mCheck = db.rawQuery("select kotLineId from kotLineItems where kotNumber='" + kotLineItems.getKotNumber() + "' and kotLineId = '" + kotLineItems.getKotLineId() + "' and isDeleted='N' ", null);
+                long kotItemId = -1;
+
+                while (mCheck.moveToNext()) {
+                    kotItemId = mCheck.getLong(0);
+                }
+                mCheck.close();
+
+                if (kotItemId != -1 && kotLineItems.getIsDeleted().equalsIgnoreCase("Y")) {
+                    //send the notification to activity
+                    ITokenDeletedListener.getInstance().tokenStatus();
+                }
+
+                String strSQL = "update kotLineItems set isDeleted='"+kotLineItems.getIsDeleted()+"' where kotLineId='" + kotLineId + "' and kotNumber = '" + kotLineItems.getKotNumber() + "'  ;";
+                db.execSQL(strSQL);
+
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -2665,7 +2698,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
         SQLiteDatabase db = this.getReadableDatabase();
         try {
-            Cursor cursor = db.rawQuery("select * from kotLineItems where kotNumber ='" + kotNumber + "' and isExtraProduct='N' ", null);
+            Cursor cursor = db.rawQuery("select * from kotLineItems where kotNumber ='" + kotNumber + "' and isExtraProduct='N' and isDeleted='N' ", null);
 
             while (cursor.moveToNext()) {
                 kotLineItems = new KOTLineItems();
@@ -2697,6 +2730,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 kotLineItems.setCreateTime(cursor.getLong(22));
 
                 product.setPreparationTime(cursor.getString(23));
+                kotLineItems.setIsDeleted(cursor.getString(24));
                 kotLineItems.setProduct(product);
 
                 kotLineItemList.add(kotLineItems);

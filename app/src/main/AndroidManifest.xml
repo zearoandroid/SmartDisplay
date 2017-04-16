@@ -22,7 +22,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".presentation.view.activity.MainActivity"
+            android:name=".presentation.view.activity.Splash"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateHidden">
             <intent-filter>
@@ -34,7 +34,10 @@
         <activity
             android:name=".presentation.view.activity.KOTItemDisplay"
             android:keepScreenOn="true" />
-        <activity android:name=".presentation.view.activity.ManualSyncActivity"></activity>
+        <activity android:name=".presentation.view.activity.ManualSyncActivity" />
+        <activity
+            android:name=".presentation.view.activity.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

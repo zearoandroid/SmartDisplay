@@ -11,10 +11,20 @@
         android:icon="@drawable/ic_autorenew"
         android:title="@string/menuitem_refresh"
         app:showAsAction="always" />-->
+    <item
+        android:id="@+id/action_network_status"
+        android:icon="@drawable/ic_green"
+        android:title="@string/connectionStatus"
+        app:showAsAction="always" />
 
     <item android:id="@+id/action_sync"
-        android:title="Sync"
+        android:title="Manual Sync"
         android:icon="@drawable/ic_sync"
+        app:showAsAction="always"/>
+
+    <item android:id="@+id/action_update"
+        android:title="App Update"
+        android:icon="@drawable/ic_system_update"
         app:showAsAction="always"/>
 
     <item android:id="@+id/action_logout"

@@ -10,6 +10,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -124,6 +125,10 @@ public class LoadingDialogFragment extends AbstractDialogFragment {
                     progressWheel.stopSpinning();
                     Toast.makeText(context, "Device not registered to server!", Toast.LENGTH_SHORT).show();
                     dismissAllowingStateLoss();
+                    break;
+                case AppConstants.UPDATE_APP:
+                    progressWheel.stopSpinning();
+                    showAppInstallDialog();
                     break;
                 default:
                     break;
@@ -300,5 +305,18 @@ public class LoadingDialogFragment extends AbstractDialogFragment {
             //show network failure dialog or toast
             NetworkErrorDialog.buildDialog(context).show();
         }
+    }
+
+    public void showAppInstallDialog(){
+        try {
+            //show denomination screen
+            FragmentManager localFragmentManager = getActivity().getSupportFragmentManager();
+            AppUpdateFragment appUpdateFragment = new AppUpdateFragment();
+            appUpdateFragment.show(localFragmentManager, "AppUpdateFragment");
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        dismissAllowingStateLoss();
     }
 }

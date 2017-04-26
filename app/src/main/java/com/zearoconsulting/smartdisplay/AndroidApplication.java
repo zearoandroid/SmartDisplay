@@ -6,6 +6,7 @@ import android.graphics.Typeface;
 
 import com.zearoconsulting.smartdisplay.data.AppDataManager;
 import com.zearoconsulting.smartdisplay.data.DBHelper;
+import com.zearoconsulting.smartdisplay.domain.receivers.ConnectivityReceiver;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 
@@ -81,8 +82,8 @@ public class AndroidApplication extends Application {
                 "fonts/GothamRounded-Book.otf");
     }
 
-    public void setConnectivityListener(com.zearoconsulting.smartdisplay.domain.receivers.ConnectivityReceiver.ConnectivityReceiverListener listener) {
-        com.zearoconsulting.smartdisplay.domain.receivers.ConnectivityReceiver.connectivityReceiverListener = listener;
+    public void setConnectivityListener(ConnectivityReceiver.ConnectivityReceiverListener listener) {
+        ConnectivityReceiver.connectivityReceiverListener = listener;
     }
 
 }

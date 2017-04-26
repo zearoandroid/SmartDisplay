@@ -7,4 +7,5 @@
     <string name="hint_server_address">Please enter server address</string>
     <string name="hint_port">Please enter server port</string>
     <string name="title_activity_splash">Splash</string>
+    <string name="connectionStatus">Connection Status</string>
 </resources>

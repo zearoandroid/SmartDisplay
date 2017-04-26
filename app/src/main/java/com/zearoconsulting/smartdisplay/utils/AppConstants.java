@@ -137,6 +137,12 @@ public class AppConstants {
 
     public static final int NO_KOT_DATA_AVAILABLE = 44;
 
+    public static final int UPDATE_APP = 100;
+
+    public static final int CHECK_UPDATE_AVAILABLE = 101;
+
+    public static final int NO_UPDATE_AVAILABLE = 102;
+
     /** notify response failure key */
     public static final String NETWORK_FAILURE = "Not connected to Internet";
 

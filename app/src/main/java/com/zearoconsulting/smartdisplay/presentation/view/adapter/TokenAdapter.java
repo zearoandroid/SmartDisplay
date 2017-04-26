@@ -61,7 +61,7 @@ public class TokenAdapter extends RecyclerView.Adapter<TokenAdapter.TokenListRow
 
         final KOTHeader kotHeader = mKOTHeaderList.get(pos);
         List<KOTLineItems> mKotItemList = mDBHelper.getKOTLineItem(kotHeader.getKotNumber());
-        if(mKotItemList.size()!=0){
+        //if(mKotItemList.size()!=0){
 
             holder.txtKOTNumView.setText(String.valueOf(kotHeader.getKotNumber()));
 
@@ -148,7 +148,7 @@ public class TokenAdapter extends RecyclerView.Adapter<TokenAdapter.TokenListRow
                 holder.btnKOTComplete.setText("Order Delivered");
             else
                 holder.btnKOTComplete.setText("Order Complete");
-        }
+        //}
 
     }
 

@@ -151,7 +151,7 @@ public class JSONParser {
                     mJsonObj.put("operation", "updateKotDelivered");
                     break;
                 case AppConstants.CHECK_UPDATE_AVAILABLE:
-                    mJsonObj.put("operation","checkAppUpdate");
+                    mJsonObj.put("operation", "checkAppUpdate");
                     break;
                 default:
                     break;
@@ -254,11 +254,10 @@ public class JSONParser {
                         mOrg.setOrgArabicName("");
 
                     //checking org image is available or not
-                    if (orgJson.has("orgImage")){
-                        String imagePath = FileUtils.storeImage(orgJson.getString("orgImage"),orgJson.getLong("orgId"),null);
+                    if (orgJson.has("orgImage")) {
+                        String imagePath = FileUtils.storeImage(orgJson.getString("orgImage"), orgJson.getLong("orgId"), null);
                         mOrg.setOrgImage(imagePath);
-                    }
-                    else
+                    } else
                         mOrg.setOrgImage("");
 
                     //checking org phone is available or not
@@ -311,7 +310,7 @@ public class JSONParser {
                 roleAccessArray = json.getJSONArray("roleAccessDetails");
                 for (int i = 0; i < roleAccessArray.length(); i++) {
                     JSONObject roleAccessJson = (JSONObject) roleAccessArray.get(i);
-                    mDBHelper.addRoleAccess(mAppManager.getClientID(),roleAccessJson.getLong("orgId"), roleAccessJson.getLong("roleId"));
+                    mDBHelper.addRoleAccess(mAppManager.getClientID(), roleAccessJson.getLong("orgId"), roleAccessJson.getLong("roleId"));
                 }
 
                 warehouseArray = json.getJSONArray("warehouseDetails");
@@ -330,7 +329,7 @@ public class JSONParser {
                 b.putInt("Type", AppConstants.LOGIN_FAILURE);
                 b.putString("OUTPUT", "");
             } else if (json.getInt("responseCode") == 1000) {
-                if(json.has("appDownloadPath"))
+                if (json.has("appDownloadPath"))
                     mAppManager.saveAppPath(json.getString("appDownloadPath"));
 
                 b.putInt("Type", AppConstants.UPDATE_APP);
@@ -371,7 +370,7 @@ public class JSONParser {
                 b.putInt("Type", AppConstants.DEVICE_NOT_REGISTERED);
                 b.putString("OUTPUT", "");
             } else if (json.getInt("responseCode") == 1000) {
-                if(json.has("appDownloadPath"))
+                if (json.has("appDownloadPath"))
                     mAppManager.saveAppPath(json.getString("appDownloadPath"));
 
                 b.putInt("Type", AppConstants.UPDATE_APP);
@@ -420,7 +419,7 @@ public class JSONParser {
                 b.putInt("Type", AppConstants.DEVICE_NOT_REGISTERED);
                 b.putString("OUTPUT", "");
             } else if (json.getInt("responseCode") == 1000) {
-                if(json.has("appDownloadPath"))
+                if (json.has("appDownloadPath"))
                     mAppManager.saveAppPath(json.getString("appDownloadPath"));
 
                 b.putInt("Type", AppConstants.UPDATE_APP);
@@ -439,7 +438,7 @@ public class JSONParser {
         mHandler.sendMessage(msg);
     }
 
-    public void parseTables(String jsonStr, Handler mHandler){
+    public void parseTables(String jsonStr, Handler mHandler) {
         Log.i("RESPONSE", jsonStr);
         Message msg = new Message();
         JSONObject json;
@@ -464,13 +463,15 @@ public class JSONParser {
                     tables.setTableId(obj.getLong("tablesId"));
                     tables.setTableName(obj.getString("tablesName"));
                     tables.setOrderAvailable("N");
+                    tables.setIsCoversLevel(obj.getString("isCoversLevel"));
+                    tables.setTableGroupId(obj.getLong("tableGroupId"));
 
                     mDBHelper.addTables(tables);
 
                     tableList.add(tables);
                 }
             } else if (json.getInt("responseCode") == 1000) {
-                if(json.has("appDownloadPath"))
+                if (json.has("appDownloadPath"))
                     mAppManager.saveAppPath(json.getString("appDownloadPath"));
 
                 b.putInt("Type", AppConstants.UPDATE_APP);
@@ -495,7 +496,7 @@ public class JSONParser {
         }
     }
 
-    public void parseTerminals(String jsonStr, Handler mHandler){
+    public void parseTerminals(String jsonStr, Handler mHandler) {
         Log.i("RESPONSE", jsonStr);
         Message msg = new Message();
         JSONObject json;
@@ -526,7 +527,7 @@ public class JSONParser {
                     terminalsList.add(terminals);
                 }
             } else if (json.getInt("responseCode") == 1000) {
-                if(json.has("appDownloadPath"))
+                if (json.has("appDownloadPath"))
                     mAppManager.saveAppPath(json.getString("appDownloadPath"));
 
                 b.putInt("Type", AppConstants.UPDATE_APP);
@@ -607,19 +608,18 @@ public class JSONParser {
 
                         //load image to sdcard and store the path to db
                         if (obj.has("categoryImage")) {
-                            String imagePath = FileUtils.storeImage(obj.getString("categoryImage"),obj.getLong("categoryId"),null);
-                            category.setCategoryImage(imagePath);
+                            //String imagePath = FileUtils.storeImage(obj.getString("categoryImage"),obj.getLong("categoryId"),null);
+                            category.setCategoryImage("");
                         } else {
                             // Retrieve the image from the res folder
-                            Bitmap bitmap = BitmapFactory.decodeResource(mContext.getResources(),
-                                    R.drawable.no_product);
-                            String imagePath = FileUtils.storeImage("",obj.getLong("categoryId"),bitmap);
-                            category.setCategoryImage(imagePath);
+                            //Bitmap bitmap = BitmapFactory.decodeResource(mContext.getResources(),R.drawable.no_product);
+                            //String imagePath = FileUtils.storeImage("",obj.getLong("categoryId"),bitmap);
+                            category.setCategoryImage("");
                         }
 
                         if (obj.has("showDigitalMenu")) {
                             category.setShowDigitalMenu(obj.getString("showDigitalMenu"));
-                        }else{
+                        } else {
                             category.setShowDigitalMenu("Y");
                         }
 
@@ -632,12 +632,12 @@ public class JSONParser {
                         categoryList.add(category);
                     }
                 } else if (json.getInt("responseCode") == 1000) {
-                    if(json.has("appDownloadPath"))
+                    if (json.has("appDownloadPath"))
                         mAppManager.saveAppPath(json.getString("appDownloadPath"));
 
                     b.putInt("Type", AppConstants.UPDATE_APP);
                     b.putString("OUTPUT", "");
-                }  else if (json.getInt("responseCode") == 301) {
+                } else if (json.getInt("responseCode") == 301) {
                     b.putInt("Type", AppConstants.DEVICE_NOT_REGISTERED);
                     b.putString("OUTPUT", "");
                 }
@@ -651,8 +651,8 @@ public class JSONParser {
                     b.putInt("Type", AppConstants.CATEGORY_RECEIVED);
                     b.putString("OUTPUT", "");
                 }
-                    msg.setData(b);
-                    mHandler.sendMessage(msg);
+                msg.setData(b);
+                mHandler.sendMessage(msg);
             }
         }
     }
@@ -699,14 +699,14 @@ public class JSONParser {
 
                         //load image to sdcard and store the path to db
                         if (obj.has("productImage")) {
-                            String imagePath = FileUtils.storeImage(obj.getString("productImage"),obj.getLong("productId"),null);
-                            product.setProdImage(imagePath);
+                            //String imagePath = FileUtils.storeImage(obj.getString("productImage"),obj.getLong("productId"),null);
+                            product.setProdImage("");
                         } else {
                             // Retrieve the image from the res folder
                             Bitmap bitmap = BitmapFactory.decodeResource(mContext.getResources(),
                                     R.drawable.no_product);
-                            String imagePath = FileUtils.storeImage("",obj.getLong("productId"),bitmap);
-                            product.setProdImage(imagePath);
+                            String imagePath = FileUtils.storeImage("", obj.getLong("productId"), bitmap);
+                            product.setProdImage("");
                         }
 
                         if (obj.has("productArabicName")) {
@@ -758,8 +758,8 @@ public class JSONParser {
                         productList.add(product);
                     }
 
-                }else if (json.getInt("responseCode") == 1000) {
-                    if(json.has("appDownloadPath"))
+                } else if (json.getInt("responseCode") == 1000) {
+                    if (json.has("appDownloadPath"))
                         mAppManager.saveAppPath(json.getString("appDownloadPath"));
 
                     b.putInt("Type", AppConstants.UPDATE_APP);
@@ -777,8 +777,8 @@ public class JSONParser {
                     b.putInt("Type", AppConstants.PRODUCTS_RECEIVED);
                     b.putString("OUTPUT", "");
                 }
-                    msg.setData(b);
-                    mHandler.sendMessage(msg);
+                msg.setData(b);
+                mHandler.sendMessage(msg);
             }
         }
     }
@@ -789,7 +789,7 @@ public class JSONParser {
      * @param jsonStr
      * @param mHandler
      */
-    public void parseKOTData(String jsonStr, Handler mHandler){
+    public void parseKOTData(String jsonStr, Handler mHandler) {
         AppConstants.isKOTParsing = true;
         Runnable myThread = new ParseKOTDataThread(jsonStr, mHandler);
         new Thread(myThread).start();
@@ -801,11 +801,11 @@ public class JSONParser {
         Handler mHandler;
 
         JSONObject json;
-        JSONArray jsonTableArray = null, jsonTokenArray, jsonProductArray, jsonTokenCompletedArray=null;
+        JSONArray jsonTableArray = null, jsonTokenArray, jsonProductArray, jsonTokenCompletedArray = null;
 
         long kotNumber, invoiceNumber, terminalID, tableId;
         double totalAmount;
-        String notes, kotType, waiterName, printed="N", orderType = "Running";
+        String notes, kotType, waiterName, printed = "N", orderType = "Running";
         int qty;
         Message msg = new Message();
 
@@ -826,13 +826,13 @@ public class JSONParser {
 
                     AppLog.e("PARSER", json.toString());
 
-                    if(json.has("tables"))
-                    jsonTableArray = json.getJSONArray("tables");
+                    if (json.has("tables"))
+                        jsonTableArray = json.getJSONArray("tables");
 
-                    if(json.has("KotcompletedArray"))
-                    jsonTokenCompletedArray = json.getJSONArray("KotcompletedArray");
+                    if (json.has("KotcompletedArray"))
+                        jsonTokenCompletedArray = json.getJSONArray("KotcompletedArray");
 
-                    if(jsonTableArray!=null) {
+                    if (jsonTableArray != null) {
                         //Loop for getting tables
                         for (int i = 0; i < jsonTableArray.length(); i++) {
 
@@ -884,6 +884,7 @@ public class JSONParser {
                                 kotHeader.setPrinted(printed);
                                 kotHeader.setPosted("N");
                                 kotHeader.setSelected("N");
+                                kotHeader.setCoversDetails(tokenObj.getString("coversDetails"));
 
                                 Date date = new Date(System.currentTimeMillis());
                                 long mCurrentTime = date.getTime();
@@ -922,7 +923,7 @@ public class JSONParser {
                                         product.setPreparationTime(prod.getPreparationTime());
 
                                         long kotLineTime = 0;
-                                        if(prod.getPreparationTime().contains(":")) {
+                                        if (prod.getPreparationTime().contains(":")) {
                                             String[] units = product.getPreparationTime().split(":"); //will break the string up into an array
                                             int hour = Integer.parseInt(units[0]); //first element
                                             int minute = Integer.parseInt(units[1]); //second element
@@ -930,7 +931,7 @@ public class JSONParser {
                                             long hours = hour * 60 * 60 * 1000;
                                             long minutes = minute * 60 * 1000;
 
-                                            kotLineTime = System.currentTimeMillis()+hours+minutes;
+                                            kotLineTime = System.currentTimeMillis() + hours + minutes;
 
                                         }
 
@@ -958,10 +959,10 @@ public class JSONParser {
                                         kotLineItems.setRefRowId(0);
                                         kotLineItems.setIsExtraProduct("N");
                                         kotLineItems.setIsDeleted(productObj.getString("isDeleted"));
-                                        if(kotLineTime == 0)
-                                        kotLineItems.setCreateTime(System.currentTimeMillis());
+                                        if (kotLineTime == 0)
+                                            kotLineItems.setCreateTime(System.currentTimeMillis());
                                         else
-                                        kotLineItems.setCreateTime(kotLineTime);
+                                            kotLineItems.setCreateTime(kotLineTime);
 
                                         //insert kot line items
                                         mDBHelper.addKOTLineItems(kotLineItems, product, qty);
@@ -975,15 +976,15 @@ public class JSONParser {
                         }
                     }
 
-                    if(jsonTokenCompletedArray!=null){
-                        for(int l=0; l<jsonTokenCompletedArray.length(); l++){
+                    if (jsonTokenCompletedArray != null) {
+                        for (int l = 0; l < jsonTokenCompletedArray.length(); l++) {
                             JSONObject tokenObj = (JSONObject) jsonTokenCompletedArray.get(l);
                             kotNumber = tokenObj.getLong("KOTNumber");
                             mDBHelper.deleteKOTTableData(kotNumber);
                         }
                     }
 
-                    if(jsonTableArray==null && jsonTokenCompletedArray == null){
+                    if (jsonTableArray == null && jsonTokenCompletedArray == null) {
                         mDBHelper.deleteKOTTable();
                         AppLog.e("PARSER", "NO KOT AVAILABLE");
                     }
@@ -1001,12 +1002,12 @@ public class JSONParser {
                     b.putInt("Type", AppConstants.DEVICE_NOT_REGISTERED);
                     b.putString("OUTPUT", "");
                 } else if (json.getInt("responseCode") == 1000) {
-                    if(json.has("appDownloadPath"))
+                    if (json.has("appDownloadPath"))
                         mAppManager.saveAppPath(json.getString("appDownloadPath"));
 
                     b.putInt("Type", AppConstants.UPDATE_APP);
                     b.putString("OUTPUT", "");
-                } else{
+                } else {
                     b.putInt("Type", AppConstants.SERVER_ERROR);
                     b.putString("OUTPUT", "");
 
@@ -1027,7 +1028,7 @@ public class JSONParser {
         }
     }
 
-    private void parseRelatedProducts(long tableId, long terminalID, long kotNumber, long invNumber, long refLineId, JSONArray mRelatedProdArray){
+    private void parseRelatedProducts(long tableId, long terminalID, long kotNumber, long invNumber, long refLineId, JSONArray mRelatedProdArray) {
 
         try {
             //getting products array
@@ -1054,7 +1055,7 @@ public class JSONParser {
                 product.setPreparationTime(prod.getPreparationTime());
 
                 long kotLineTime = 0;
-                if(prod.getPreparationTime().contains(":")) {
+                if (prod.getPreparationTime().contains(":")) {
                     String[] units = product.getPreparationTime().split(":"); //will break the string up into an array
                     int hour = Integer.parseInt(units[0]); //first element
                     int minute = Integer.parseInt(units[1]); //second element
@@ -1062,7 +1063,7 @@ public class JSONParser {
                     long hours = hour * 60 * 60 * 1000;
                     long minutes = minute * 60 * 1000;
 
-                    kotLineTime = System.currentTimeMillis()+hours+minutes;
+                    kotLineTime = System.currentTimeMillis() + hours + minutes;
 
                 }
 
@@ -1080,7 +1081,7 @@ public class JSONParser {
                 kotLineItems.setRefRowId(refLineId);
                 kotLineItems.setIsExtraProduct("Y");
                 kotLineItems.setIsDeleted(productObj.getString("isDeleted"));
-                if(kotLineTime == 0)
+                if (kotLineTime == 0)
                     kotLineItems.setCreateTime(System.currentTimeMillis());
                 else
                     kotLineItems.setCreateTime(kotLineTime);
@@ -1089,12 +1090,12 @@ public class JSONParser {
                 mDBHelper.addKOTLineItems(kotLineItems, product, productObj.getInt("qty"));
 
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void parseKOTStatus(String jsonStr, Handler mHandler){
+    public void parseKOTStatus(String jsonStr, Handler mHandler) {
         Message msg = new Message();
         JSONObject json;
         try {
@@ -1115,7 +1116,7 @@ public class JSONParser {
                     b.putInt("Type", AppConstants.DEVICE_NOT_REGISTERED);
                     b.putString("OUTPUT", "");
                 } else if (json.getInt("responseCode") == 1000) {
-                    if(json.has("appDownloadPath"))
+                    if (json.has("appDownloadPath"))
                         mAppManager.saveAppPath(json.getString("appDownloadPath"));
 
                     b.putInt("Type", AppConstants.UPDATE_APP);
@@ -1144,12 +1145,11 @@ public class JSONParser {
                 mDBHelper.deleteKOTTableData(json.getLong("KOTNumber"));
                 b.putInt("Type", AppConstants.POST_KOT_DATA_RESPONSE);
                 b.putString("OUTPUT", "");
-            }
-            else if (json.getInt("responseCode") == 301) {
+            } else if (json.getInt("responseCode") == 301) {
                 b.putInt("Type", AppConstants.DEVICE_NOT_REGISTERED);
                 b.putString("OUTPUT", "");
             } else if (json.getInt("responseCode") == 1000) {
-                if(json.has("appDownloadPath"))
+                if (json.has("appDownloadPath"))
                     mAppManager.saveAppPath(json.getString("appDownloadPath"));
 
                 b.putInt("Type", AppConstants.UPDATE_APP);
@@ -1178,12 +1178,11 @@ public class JSONParser {
                 mDBHelper.deleteKOTTableData(json.getLong("KOTNumber"));
                 b.putInt("Type", AppConstants.POST_KOT_DATA_RESPONSE);
                 b.putString("OUTPUT", "");
-            }
-            else if (json.getInt("responseCode") == 301) {
+            } else if (json.getInt("responseCode") == 301) {
                 b.putInt("Type", AppConstants.DEVICE_NOT_REGISTERED);
                 b.putString("OUTPUT", "");
             } else if (json.getInt("responseCode") == 1000) {
-                if(json.has("appDownloadPath"))
+                if (json.has("appDownloadPath"))
                     mAppManager.saveAppPath(json.getString("appDownloadPath"));
 
                 b.putInt("Type", AppConstants.UPDATE_APP);
@@ -1218,7 +1217,7 @@ public class JSONParser {
                 b.putInt("Type", AppConstants.NETWORK_ERROR);
                 b.putString("OUTPUT", "");
             } else if (json.getInt("responseCode") == 1000) {
-                if(json.has("appDownloadPath"))
+                if (json.has("appDownloadPath"))
                     mAppManager.saveAppPath(json.getString("appDownloadPath"));
 
                 b.putInt("Type", AppConstants.UPDATE_APP);

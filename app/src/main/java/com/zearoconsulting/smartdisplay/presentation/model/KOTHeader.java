@@ -20,6 +20,7 @@ public class KOTHeader implements Serializable {
     private String isKOT;
     private String orderType;
     private String kotType;
+    private String coversDetails;
 
     public String getKotType() {
         return kotType;
@@ -143,5 +144,13 @@ public class KOTHeader implements Serializable {
 
     public void setCreateTime(long createTime) {
         this.createTime = createTime;
+    }
+
+    public String getCoversDetails() {
+        return coversDetails;
+    }
+
+    public void setCoversDetails(String coversDetails) {
+        this.coversDetails = coversDetails;
     }
 }

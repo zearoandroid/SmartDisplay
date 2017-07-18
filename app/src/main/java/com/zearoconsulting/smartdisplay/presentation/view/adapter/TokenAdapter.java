@@ -66,10 +66,13 @@ public class TokenAdapter extends RecyclerView.Adapter<TokenAdapter.TokenListRow
             holder.txtKOTNumView.setText(String.valueOf(kotHeader.getKotNumber()));
 
             if(kotHeader.getTablesId() == 0){
-                holder.txtTableNameView.setText("CS"+kotHeader.getInvoiceNumber());
+                holder.txtTableNameView.setText(("CS"+kotHeader.getInvoiceNumber()));
             }else{
                 Tables tables =mDBHelper.getTableData(mAppDataManager.getClientID(),mAppDataManager.getOrgID(),kotHeader.getTablesId());
-                holder.txtTableNameView.setText(tables.getTableName());
+                if(tables!= null){
+                    holder.txtTableNameView.setText(tables.getTableName());
+                    holder.txtCoverNameView.setText(("Covers: "+android.text.TextUtils.join(",", mDBHelper.getSelectedCoverNames(kotHeader.getCoversDetails()))));
+                }
             }
 
             holder.txtOrderByView.setText(kotHeader.getOrderBy());
@@ -161,6 +164,7 @@ public class TokenAdapter extends RecyclerView.Adapter<TokenAdapter.TokenListRow
 
         protected TextView txtKOTNumView;
         protected TextView txtTableNameView;
+        protected TextView txtCoverNameView;
         protected TextView txtOrderByView;
         protected TextView txtDateTimeView;
         protected TextView txtProductsView;
@@ -173,6 +177,7 @@ public class TokenAdapter extends RecyclerView.Adapter<TokenAdapter.TokenListRow
             mView = view;
             this.txtKOTNumView = (TextView) view.findViewById(R.id.txtKOTNumView);
             this.txtTableNameView = (TextView) view.findViewById(R.id.txtTableNameView);
+            this.txtCoverNameView = (TextView) view.findViewById(R.id.cover_name);
             this.txtOrderByView = (TextView) view.findViewById(R.id.txtOrderByView);
             this.txtDateTimeView = (TextView) view.findViewById(R.id.txtDateTimeView);
             this.txtProductsView = (TextView) view.findViewById(R.id.txtProductsView);

@@ -27,8 +27,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:padding="5dp"
-                android:textSize="@dimen/kot_label_size"
-                android:text="" />
+                android:text=""
+                android:textSize="@dimen/kot_label_size" />
 
             <TextView
                 android:id="@+id/txtTableNameView"
@@ -36,20 +36,39 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="right"
-                android:textSize="@dimen/kot_label_size"
                 android:paddingBottom="5dp"
                 android:paddingLeft="5dp"
                 android:paddingRight="20dp"
                 android:paddingTop="5dp"
-                android:text="" />
+                android:text=""
+                android:textSize="@dimen/kot_label_size" />
 
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/cover_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/headerView">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:textSize="15sp"
+                android:id="@+id/cover_name"
+                android:paddingEnd="20dp"
+                android:paddingRight="20dp"
+                android:paddingStart="0dp"
+                android:paddingLeft="0dp"
+                android:text=""/>
         </LinearLayout>
 
         <LinearLayout
             android:id="@+id/dateTimeView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/headerView"
+            android:layout_below="@+id/cover_layout"
             android:orientation="vertical">
 
             <TextView
@@ -57,8 +76,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="5dp"
-                android:textSize="@dimen/kot_label_size"
-                android:text="" />
+                android:text=""
+                android:textSize="@dimen/kot_label_size" />
 
             <TextView
                 android:id="@+id/txtDateTimeView"
@@ -66,8 +85,8 @@
                 android:layout_height="wrap_content"
                 android:paddingLeft="5dp"
                 android:paddingTop="5dp"
-                android:textSize="@dimen/kot_label_size"
-                android:text="" />
+                android:text=""
+                android:textSize="@dimen/kot_label_size" />
 
         </LinearLayout>
 
@@ -85,10 +104,10 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/lineView"
             android:layout_margin="5dp"
+            android:background="#3C3547"
             android:padding="10dp"
             android:textColor="@color/white"
-            android:textSize="@dimen/kot_label_size"
-            android:background="#3C3547" />
+            android:textSize="@dimen/kot_label_size" />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/tokenItemListView"
@@ -115,8 +134,8 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/lineView2"
             android:layout_margin="5dp"
-            android:textSize="@dimen/kot_label_size"
-            android:text="KOT Complete" />
+            android:text="KOT Complete"
+            android:textSize="@dimen/kot_label_size" />
     </RelativeLayout>
 
 </android.support.v7.widget.CardView>

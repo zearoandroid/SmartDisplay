@@ -34,7 +34,7 @@ import java.util.Map;
 public class DBHelper extends SQLiteOpenHelper {
 
     // Database Version
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     // Database Name
     private static final String DATABASE_NAME = "smartDisplayDB";
@@ -186,15 +186,19 @@ public class DBHelper extends SQLiteOpenHelper {
     private static final String KEY_KOT_REF_LINE_ID = "kotRefLineId";
     private static final String KEY_KOT_EXTRA_PRODUCT = "isExtraProduct";
 
+    private static final String KEY_IS_COVERS_LEVEL = "isCoversLevel";
+    private static final String KEY_M_TABLE_GROUP_ID = "m_table_group_id";
+    private static final String KEY_COVERS_DETAILS = "covers_details";
+
     //create query for TABLE_ORGANIZATION
     private static final String ORGANIZATION_CREATE_QUERY = "CREATE TABLE "
-            + TABLE_ORGANIZATION + "(" + KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CLIENT_ID+ " NUMERIC, " + KEY_ORG_ID + " NUMERIC, " + KEY_ORG_NAME + " TEXT, " + KEY_ORG_ARABIC_NAME + " TEXT, "
+            + TABLE_ORGANIZATION + "(" + KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CLIENT_ID + " NUMERIC, " + KEY_ORG_ID + " NUMERIC, " + KEY_ORG_NAME + " TEXT, " + KEY_ORG_ARABIC_NAME + " TEXT, "
             + KEY_ORG_IMAGE + " TEXT, " + KEY_ORG_ADDRESS + " TEXT, " + KEY_ORG_PHONE + " TEXT, " + KEY_ORG_EMAIL + " TEXT, " + KEY_ORG_CITY + " TEXT, "
             + KEY_ORG_COUNTRY + " TEXT, " + KEY_ORG_WEB_URL + " TEXT, " + KEY_IS_DEFAULT + " TEXT);";
 
     //create query for TABLE_WAREHOUSE
     private static final String WAREHOUSE_CREATE_QUERY = "CREATE TABLE "
-            + TABLE_WAREHOUSE + "(" + KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CLIENT_ID+ " NUMERIC, " + KEY_ORG_ID + " NUMERIC, " + KEY_WAREHOUSE_ID + " NUMERIC, " + KEY_WAREHOUSE_NAME
+            + TABLE_WAREHOUSE + "(" + KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CLIENT_ID + " NUMERIC, " + KEY_ORG_ID + " NUMERIC, " + KEY_WAREHOUSE_ID + " NUMERIC, " + KEY_WAREHOUSE_NAME
             + " TEXT, " + KEY_IS_DEFAULT + " TEXT);";
 
     //create query for TABLE_ROLE
@@ -204,16 +208,16 @@ public class DBHelper extends SQLiteOpenHelper {
 
     //create query for TABLE_ROLE
     private static final String ROLE_ACCESS_CREATE_QUERY = "CREATE TABLE "
-            + TABLE_ROLE_ACESS + "(" + KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CLIENT_ID+ " NUMERIC, " + KEY_ORG_ID + " NUMERIC, " + KEY_ROLE_ID + " NUMERIC);";
+            + TABLE_ROLE_ACESS + "(" + KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CLIENT_ID + " NUMERIC, " + KEY_ORG_ID + " NUMERIC, " + KEY_ROLE_ID + " NUMERIC);";
 
     //create query for TABLE_ROLE
     private static final String CATEGORY_CREATE_QUERY = "CREATE TABLE "
-            + TABLE_CATEGORY + "(" + KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CLIENT_ID+ " NUMERIC, " + KEY_ORG_ID + " NUMERIC, " + KEY_CATEGORY_ID + " NUMERIC, " + KEY_CATEGORY_NAME + " TEXT, " + KEY_CATEGORY_VALUE
+            + TABLE_CATEGORY + "(" + KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CLIENT_ID + " NUMERIC, " + KEY_ORG_ID + " NUMERIC, " + KEY_CATEGORY_ID + " NUMERIC, " + KEY_CATEGORY_NAME + " TEXT, " + KEY_CATEGORY_VALUE
             + " TEXT, " + KEY_CATEGORY_IMAGE + " TEXT," + KEY_SHOWN_DIGITAL_MENU + " TEXT);";
 
     //create query for TABLE_PRODUCT
     private static final String PRODUCT_CREATE_QUERY = "CREATE TABLE "
-            + TABLE_PRODUCT + "(" + KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CLIENT_ID+ " NUMERIC, " + KEY_ORG_ID + " NUMERIC, " + KEY_CATEGORY_ID
+            + TABLE_PRODUCT + "(" + KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CLIENT_ID + " NUMERIC, " + KEY_ORG_ID + " NUMERIC, " + KEY_CATEGORY_ID
             + " NUMERIC, " + KEY_PRODUCT_ID + " NUMERIC, " + KEY_PRODUCT_NAME + " TEXT, "
             + KEY_PRODUCT_VALE + " TEXT, " + KEY_PRODUCT_UOM_ID + " NUMERIC, " + KEY_PRODUCT_UOM_VALUE + " TEXT, "
             + KEY_PRODUCT_QTY + " INTEGER, " + KEY_PRODUCT_STD_PRICE + " NUMERIC, "
@@ -223,7 +227,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     //create query for TABLE_BPARTNER
     private static final String BPARTNER_CREATE_QUERY = "CREATE TABLE "
-            + TABLE_BPARTNERS + "(" + KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CLIENT_ID+ " NUMERIC, " + KEY_ORG_ID + " NUMERIC, " + KEY_BP_ID + " NUMERIC, " + KEY_CUSTOMER_NAME + " TEXT, " + KEY_CUSTOMER_VALUE
+            + TABLE_BPARTNERS + "(" + KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CLIENT_ID + " NUMERIC, " + KEY_ORG_ID + " NUMERIC, " + KEY_BP_ID + " NUMERIC, " + KEY_CUSTOMER_NAME + " TEXT, " + KEY_CUSTOMER_VALUE
             + " NUMERIC, " + KEY_PRICELIST_ID + " NUMERIC, " + KEY_EMAIL + " TEXT, " + KEY_NUMBER + " NUMERIC);";
 
     //create query for TABLE_SUPERVISOR
@@ -246,7 +250,7 @@ public class DBHelper extends SQLiteOpenHelper {
     //create query for TABLE_POS_LINES
     private static final String POS_LINE_ITEM_CREATE_QUERY = "CREATE TABLE "
             + TABLE_POS_LINES + "(" + KEY_ID + " INTEGER PRIMARY KEY, " + KEY_POS_ID
-            + " NUMERIC, " +KEY_PRODUCT_TERMINAL_ID+ " NUMERIC, " + KEY_CATEGORY_ID + " NUMERIC, " + KEY_PRODUCT_ID + " NUMERIC, " + KEY_PRODUCT_NAME + " TEXT, "
+            + " NUMERIC, " + KEY_PRODUCT_TERMINAL_ID + " NUMERIC, " + KEY_CATEGORY_ID + " NUMERIC, " + KEY_PRODUCT_ID + " NUMERIC, " + KEY_PRODUCT_NAME + " TEXT, "
             + KEY_PRODUCT_ARABIC_NAME + " TEXT, " + KEY_PRODUCT_VALE + " TEXT, " + KEY_PRODUCT_UOM_ID + " NUMERIC, " + KEY_PRODUCT_UOM_VALUE + " TEXT, "
             + KEY_PRODUCT_QTY + " INTEGER, " + KEY_PRODUCT_STD_PRICE + " NUMERIC, " + KEY_PRODUCT_COST_PRICE + " INTEGER, "
             + KEY_PRODUCT_DISCOUNT_TYPE + " INTEGER, " + KEY_PRODUCT_DISCOUNT_VALUE + " INTEGER, " + KEY_PRODUCT_TOTAL_PRICE + " NUMERIC, "
@@ -260,18 +264,18 @@ public class DBHelper extends SQLiteOpenHelper {
 
     //create query for KOT_TABLES
     private static final String KOT_TABLES_CREATE_QUERY = "CREATE TABLE "
-            + TABLE_KOT_TABLE + "(" + KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CLIENT_ID+ " NUMERIC, " + KEY_ORG_ID + " NUMERIC, " + KEY_KOT_TABLE_ID + " NUMERIC, " + KEY_KOT_TABLE_NAME + " TEXT, " + KEY_IS_ORDER_AVAILABLE + " TEXT  );";
+            + TABLE_KOT_TABLE + "(" + KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CLIENT_ID + " NUMERIC, " + KEY_ORG_ID + " NUMERIC, " + KEY_KOT_TABLE_ID + " NUMERIC, " + KEY_KOT_TABLE_NAME + " TEXT, " + KEY_IS_ORDER_AVAILABLE + " TEXT  );";
 
     //create query for KOT_TERMINALS
     private static final String KOT_TERMINALS_CREATE_QUERY = "CREATE TABLE "
-            + TABLE_KOT_TERMINALS + "(" + KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CLIENT_ID+ " NUMERIC, " + KEY_ORG_ID + " NUMERIC, " + KEY_KOT_TERMINAL_ID + " NUMERIC, " + KEY_KOT_TERMINAL_NAME + " TEXT, "
+            + TABLE_KOT_TERMINALS + "(" + KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CLIENT_ID + " NUMERIC, " + KEY_ORG_ID + " NUMERIC, " + KEY_KOT_TERMINAL_ID + " NUMERIC, " + KEY_KOT_TERMINAL_NAME + " TEXT, "
             + KEY_KOT_TERMINAL_IP + " TEXT );";
 
     //create query for KOT_HEADER
     private static final String KOT_HEADER_CREATE_QUERY = "CREATE TABLE "
             + TABLE_KOT_HEADER + "(" + KEY_ID + " INTEGER PRIMARY KEY, " + KEY_KOT_TABLE_ID + " NUMERIC, " + KEY_KOT_NUMBER + " NUMERIC, "
             + KEY_INVOICE_NUMBER + " NUMERIC, " + KEY_KOT_TERMINAL_ID + " NUMERIC, " + KEY_KOT_TOTAL_AMOUNT + " NUMERIC, " + KEY_KOT_ORDER_BY + " TEXT,"
-            + KEY_KOT_TYPE + " TEXT," + KEY_ORDER_TYPE + " TEXT," + KEY_IS_KOT + " TEXT, " + KEY_IS_PRINTED + " TEXT, "+ KEY_IS_POSTED + " TEXT, "+ KEY_IS_SELECTED + " TEXT, "+ KEY_CREATE_TIME + " NUMERIC);";
+            + KEY_KOT_TYPE + " TEXT," + KEY_ORDER_TYPE + " TEXT," + KEY_IS_KOT + " TEXT, " + KEY_IS_PRINTED + " TEXT, " + KEY_IS_POSTED + " TEXT, " + KEY_IS_SELECTED + " TEXT, " + KEY_CREATE_TIME + " NUMERIC);";
 
     //create query for TABLE_KOT_LINES
     private static final String KOT_LINE_ITEM_CREATE_QUERY = "CREATE TABLE "
@@ -311,6 +315,11 @@ public class DBHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
+        if (oldVersion < newVersion) {
+            db.execSQL("ALTER TABLE " + TABLE_KOT_HEADER + " ADD COLUMN " + KEY_COVERS_DETAILS + " TEXT");
+            db.execSQL("ALTER TABLE " + TABLE_KOT_TABLE + " ADD COLUMN " + KEY_IS_COVERS_LEVEL + " TEXT");
+            db.execSQL("ALTER TABLE " + TABLE_KOT_TABLE + " ADD COLUMN " + KEY_M_TABLE_GROUP_ID + " NUMERIC");
+        }
     }
 
     /**
@@ -431,7 +440,7 @@ public class DBHelper extends SQLiteOpenHelper {
      * @param roleId
      * @param orgId
      */
-    public void addRoleAccess(long clientId, long orgId,long roleId) {
+    public void addRoleAccess(long clientId, long orgId, long roleId) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         try {
@@ -479,6 +488,8 @@ public class DBHelper extends SQLiteOpenHelper {
             values.put(KEY_KOT_TABLE_ID, tables.getTableId());
             values.put(KEY_KOT_TABLE_NAME, tables.getTableName());
             values.put(KEY_IS_ORDER_AVAILABLE, tables.getOrderAvailable());
+            values.put(KEY_IS_COVERS_LEVEL, tables.getIsCoversLevel());
+            values.put(KEY_M_TABLE_GROUP_ID, tables.getTableGroupId());
 
             // Inserting Row
             db.insert(TABLE_KOT_TABLE, null, values);
@@ -586,6 +597,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 values.put(KEY_IS_POSTED, kotHeader.getPosted());
                 values.put(KEY_IS_SELECTED, kotHeader.getSelected());
                 values.put(KEY_CREATE_TIME, kotHeader.getCreateTime());
+                values.put(KEY_COVERS_DETAILS, kotHeader.getCoversDetails());
 
                 // Inserting Row
                 db.insert(TABLE_KOT_HEADER, null, values);
@@ -631,7 +643,7 @@ public class DBHelper extends SQLiteOpenHelper {
      * @param email
      * @param mobile
      */
-    public void addPOSHeader(long posId, long bPId, String name, long pricelistId, long value, String email, long mobile, int isCashCustomer,String isKOT) {
+    public void addPOSHeader(long posId, long bPId, String name, long pricelistId, long value, String email, long mobile, int isCashCustomer, String isKOT) {
 
         SQLiteDatabase db = this.getWritableDatabase();
         boolean isAvail = false;
@@ -1375,7 +1387,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
         SQLiteDatabase db = this.getReadableDatabase();
         try {
-            Cursor cursor = db.rawQuery("select categoryId, categoryName, categoryValue from category where clientId = '"+clientId+"' and orgId = '" + orgId + "' ORDER BY categoryName ASC", null);
+            Cursor cursor = db.rawQuery("select categoryId, categoryName, categoryValue from category where clientId = '" + clientId + "' and orgId = '" + orgId + "' ORDER BY categoryName ASC", null);
 
             while (cursor.moveToNext()) {
                 category = new Category();
@@ -1383,7 +1395,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 category.setCategoryName(cursor.getString(1));
                 category.setCategoryValue(cursor.getString(2));
 
-                Cursor cur = db.rawQuery("select * from product where categoryId = '" + cursor.getLong(0) + "' and clientId = '"+clientId+"' and orgId = '" + orgId + "' ORDER BY productName COLLATE NOCASE ASC ", null);
+                Cursor cur = db.rawQuery("select * from product where categoryId = '" + cursor.getLong(0) + "' and clientId = '" + clientId + "' and orgId = '" + orgId + "' ORDER BY productName COLLATE NOCASE ASC ", null);
                 int cnt = cur.getCount();
                 cur.close();
 
@@ -1406,7 +1418,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
         SQLiteDatabase db = this.getReadableDatabase();
         try {
-            Cursor cursor = db.rawQuery("select kotTableId, kotTableName, isOrderAvailable from kotTables where clientId = '"+clientId+"' and orgId = '" + orgId + "' ORDER BY kotTableId ASC", null);
+            Cursor cursor = db.rawQuery("select kotTableId, kotTableName, isOrderAvailable from kotTables where clientId = '" + clientId + "' and orgId = '" + orgId + "' ORDER BY kotTableId ASC", null);
 
             while (cursor.moveToNext()) {
                 table = new Tables();
@@ -1430,7 +1442,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
         SQLiteDatabase db = this.getReadableDatabase();
         try {
-            Cursor cursor = db.rawQuery("select kotTableId from kotTables where clientId = '"+clientId+"' and orgId = '" + orgId + "' ORDER BY kotTableId ASC", null);
+            Cursor cursor = db.rawQuery("select kotTableId from kotTables where clientId = '" + clientId + "' and orgId = '" + orgId + "' ORDER BY kotTableId ASC", null);
 
             while (cursor.moveToNext()) {
                 tableList.add(String.valueOf(cursor.getLong(0)));
@@ -1451,7 +1463,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
         SQLiteDatabase db = this.getReadableDatabase();
         try {
-            Cursor cursor = db.rawQuery("select kotTableId, kotTableName, isOrderAvailable from kotTables where clientId = '"+clientId+"' and orgId = '" + orgId + "' and kotTableId = '" + tableId + "' ", null);
+            Cursor cursor = db.rawQuery("select kotTableId, kotTableName, isOrderAvailable from kotTables where clientId = '" + clientId + "' and orgId = '" + orgId + "' and kotTableId = '" + tableId + "' ", null);
 
             while (cursor.moveToNext()) {
                 table = new Tables();
@@ -1479,7 +1491,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
         SQLiteDatabase db = this.getReadableDatabase();
         try {
-            Cursor cursor = db.rawQuery("select kotTerminalId, kotTerminalName, kotTerminalIP from kotTerminals where clientId = '"+clientId+"' and orgId = '" + orgId + "' and kotTerminalId = '" + terminalId + "' ", null);
+            Cursor cursor = db.rawQuery("select kotTerminalId, kotTerminalName, kotTerminalIP from kotTerminals where clientId = '" + clientId + "' and orgId = '" + orgId + "' and kotTerminalId = '" + terminalId + "' ", null);
 
             while (cursor.moveToNext()) {
                 terminals = new Terminals();
@@ -1594,7 +1606,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
         SQLiteDatabase db = this.getReadableDatabase();
         try {
-            Cursor cursor = db.rawQuery("select * from product where clientId = '"+clientId+"' and orgId = '" + orgId + "' and categoryId = '" + categoryId + "' ORDER BY productName COLLATE NOCASE ASC ", null);
+            Cursor cursor = db.rawQuery("select * from product where clientId = '" + clientId + "' and orgId = '" + orgId + "' and categoryId = '" + categoryId + "' ORDER BY productName COLLATE NOCASE ASC ", null);
 
             while (cursor.moveToNext()) {
                 product = new Product();
@@ -1636,7 +1648,7 @@ public class DBHelper extends SQLiteOpenHelper {
         String imgPath = "";
         SQLiteDatabase db = this.getReadableDatabase();
         try {
-            Cursor cursor = db.rawQuery("select productImage from product where clientId = '"+clientId+"' and orgId = '" + orgId + "' and categoryId = '" + categoryId + "' ", null);
+            Cursor cursor = db.rawQuery("select productImage from product where clientId = '" + clientId + "' and orgId = '" + orgId + "' and categoryId = '" + categoryId + "' ", null);
 
             while (cursor.moveToNext()) {
                 imgPath = cursor.getString(0);
@@ -1659,7 +1671,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
         SQLiteDatabase db = this.getReadableDatabase();
         try {
-            Cursor cursor = db.rawQuery("select productId from product where clientId = '"+clientId+"' and orgId = '" + orgId + "' and categoryId = '" + categoryId + "' ORDER BY productName COLLATE NOCASE ASC ", null);
+            Cursor cursor = db.rawQuery("select productId from product where clientId = '" + clientId + "' and orgId = '" + orgId + "' and categoryId = '" + categoryId + "' ORDER BY productName COLLATE NOCASE ASC ", null);
 
             while (cursor.moveToNext()) {
                 productId = cursor.getLong(0);
@@ -1682,7 +1694,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
         SQLiteDatabase db = this.getReadableDatabase();
         try {
-            Cursor cursor = db.rawQuery("select * from product where clientId = '"+clientId+"' and orgId = '" + orgId + "' and productValue = '" + prodId + "' ", null);
+            Cursor cursor = db.rawQuery("select * from product where clientId = '" + clientId + "' and orgId = '" + orgId + "' and productValue = '" + prodId + "' ", null);
 
             while (cursor.moveToNext()) {
                 product = new Product();
@@ -1726,7 +1738,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
         SQLiteDatabase db = this.getReadableDatabase();
         try {
-            Cursor cursor = db.rawQuery("select * from product where clientId = '"+clientId+"' and orgId = '" + orgId + "' and productId = '" + prodId + "' ", null);
+            Cursor cursor = db.rawQuery("select * from product where clientId = '" + clientId + "' and orgId = '" + orgId + "' and productId = '" + prodId + "' ", null);
 
             while (cursor.moveToNext()) {
                 product = new Product();
@@ -1770,7 +1782,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
         SQLiteDatabase db = this.getReadableDatabase();
         try {
-            Cursor cursor = db.rawQuery("select * from product where clientId = '"+clientId+"' and orgId = '" + orgId + "' ORDER BY productName COLLATE NOCASE ASC", null);
+            Cursor cursor = db.rawQuery("select * from product where clientId = '" + clientId + "' and orgId = '" + orgId + "' ORDER BY productName COLLATE NOCASE ASC", null);
 
             while (cursor.moveToNext()) {
                 product = new Product();
@@ -1809,7 +1821,7 @@ public class DBHelper extends SQLiteOpenHelper {
     /**
      * @return mBPList
      */
-    public List<BPartner> getBPartners(long clientId,long orgId) {
+    public List<BPartner> getBPartners(long clientId, long orgId) {
 
         List<BPartner> mBPList = new ArrayList<BPartner>();
 
@@ -1817,7 +1829,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
         SQLiteDatabase db = this.getReadableDatabase();
         try {
-            Cursor cursor = db.rawQuery("select * from businessPartner where clientId = '"+clientId+"' and orgId = '" + orgId + "'", null);
+            Cursor cursor = db.rawQuery("select * from businessPartner where clientId = '" + clientId + "' and orgId = '" + orgId + "'", null);
 
             while (cursor.moveToNext()) {
                 bPartner = new BPartner();
@@ -1862,6 +1874,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     /**
      * If generated kot from counter sales
+     *
      * @param posId
      * @param productId
      * @param isKOT
@@ -1871,7 +1884,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
         try {
             String strSQL = "update posLineItems set isUpdated='Y', isKOTGenerated='" + isKOT
-                    + "' where posId='"+ posId + "' and productId = '" + productId + "' ;";
+                    + "' where posId='" + posId + "' and productId = '" + productId + "' ;";
             db.execSQL(strSQL);
         } catch (Exception e) {
             e.printStackTrace();
@@ -2259,7 +2272,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
                 // Inserting Row
                 db.insert(TABLE_KOT_LINES, null, values);
-            }else{
+            } else {
 
                 Cursor mCheck = db.rawQuery("select kotLineId from kotLineItems where kotNumber='" + kotLineItems.getKotNumber() + "' and kotLineId = '" + kotLineItems.getKotLineId() + "' and isDeleted='N' ", null);
                 long kotItemId = -1;
@@ -2274,7 +2287,7 @@ public class DBHelper extends SQLiteOpenHelper {
                     ITokenDeletedListener.getInstance().tokenStatus();
                 }
 
-                String strSQL = "update kotLineItems set isDeleted='"+kotLineItems.getIsDeleted()+"' where kotLineId='" + kotLineId + "' and kotNumber = '" + kotLineItems.getKotNumber() + "'  ;";
+                String strSQL = "update kotLineItems set isDeleted='" + kotLineItems.getIsDeleted() + "' where kotLineId='" + kotLineId + "' and kotNumber = '" + kotLineItems.getKotNumber() + "'  ;";
                 db.execSQL(strSQL);
 
             }
@@ -2507,6 +2520,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 kotHeader.setPosted(cursor.getString(11));
                 kotHeader.setSelected(cursor.getString(12));
                 kotHeader.setCreateTime(cursor.getLong(13));
+                kotHeader.setCoversDetails(cursor.getString(14));
 
                 kotHeaderList.add(kotHeader);
             }
@@ -2558,6 +2572,28 @@ public class DBHelper extends SQLiteOpenHelper {
         }
 
         return kotHeaderList;
+    }
+
+    public List<String> getSelectedCoverNames(String CoverIDs) {
+        List<String> tableList = new ArrayList<String>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        try {
+            for (String selectedCover : CoverIDs.split(",")) {
+                String qry = "select kotTableId, kotTableName, isOrderAvailable from kotTables where " +
+                        " isCoversLevel = 'Y' and kotTableId = '" + Long.parseLong(selectedCover) + "' ORDER BY kotTableId ASC";
+                Cursor cursor = db.rawQuery(qry, null);
+                while (cursor.moveToNext()) {
+                    tableList.add(cursor.getString(1));
+                }
+                cursor.close();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            db.close();
+        }
+
+        return tableList;
     }
 
     public long getKOTInvoiceNumber(long tableId) {
@@ -2745,7 +2781,7 @@ public class DBHelper extends SQLiteOpenHelper {
         return kotLineItemList;
     }
 
-    public long getKOTLineItemPreTime(long kotNumber){
+    public long getKOTLineItemPreTime(long kotNumber) {
 
         long preTime = 0;
 
@@ -2762,7 +2798,7 @@ public class DBHelper extends SQLiteOpenHelper {
         } finally {
             db.close();
         }
-        return  preTime;
+        return preTime;
     }
 
     /**
@@ -2788,11 +2824,11 @@ public class DBHelper extends SQLiteOpenHelper {
         }
     }
 
-    public void updateKOTSelectedStatus(long tableId,String isSelect) {
+    public void updateKOTSelectedStatus(long tableId, String isSelect) {
         SQLiteDatabase db = this.getWritableDatabase();
         String strSQL;
         try {
-            strSQL = "update kotHeader set isSelected='"+isSelect+"' where kotTableId = '" + tableId + "' ;";
+            strSQL = "update kotHeader set isSelected='" + isSelect + "' where kotTableId = '" + tableId + "' ;";
             db.execSQL(strSQL);
         } catch (Exception e) {
             e.printStackTrace();
@@ -2819,7 +2855,7 @@ public class DBHelper extends SQLiteOpenHelper {
         }
     }
 
-    public List<String> getCounterSaleKOTItemTerminals(long posId){
+    public List<String> getCounterSaleKOTItemTerminals(long posId) {
 
         List<String> kotTerminalList = new ArrayList<String>();
         SQLiteDatabase db = this.getWritableDatabase();
@@ -2840,7 +2876,6 @@ public class DBHelper extends SQLiteOpenHelper {
 
 
     /**
-     *
      * @param posId
      * @param terminalId
      * @return
@@ -2865,7 +2900,6 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     /**
-     *
      * @param posId
      * @param terminalId
      * @return

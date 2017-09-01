@@ -264,7 +264,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     //create query for KOT_TABLES
     private static final String KOT_TABLES_CREATE_QUERY = "CREATE TABLE "
-            + TABLE_KOT_TABLE + "(" + KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CLIENT_ID + " NUMERIC, " + KEY_ORG_ID + " NUMERIC, " + KEY_KOT_TABLE_ID + " NUMERIC, " + KEY_KOT_TABLE_NAME + " TEXT, " + KEY_IS_ORDER_AVAILABLE + " TEXT  );";
+            + TABLE_KOT_TABLE + "(" + KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CLIENT_ID + " NUMERIC, " + KEY_ORG_ID + " NUMERIC, " + KEY_KOT_TABLE_ID + " NUMERIC, " + KEY_KOT_TABLE_NAME + " TEXT, " + KEY_IS_ORDER_AVAILABLE + " TEXT, " + KEY_IS_COVERS_LEVEL + " TEXT, " + KEY_M_TABLE_GROUP_ID + " NUMERIC);";
 
     //create query for KOT_TERMINALS
     private static final String KOT_TERMINALS_CREATE_QUERY = "CREATE TABLE "
@@ -275,7 +275,7 @@ public class DBHelper extends SQLiteOpenHelper {
     private static final String KOT_HEADER_CREATE_QUERY = "CREATE TABLE "
             + TABLE_KOT_HEADER + "(" + KEY_ID + " INTEGER PRIMARY KEY, " + KEY_KOT_TABLE_ID + " NUMERIC, " + KEY_KOT_NUMBER + " NUMERIC, "
             + KEY_INVOICE_NUMBER + " NUMERIC, " + KEY_KOT_TERMINAL_ID + " NUMERIC, " + KEY_KOT_TOTAL_AMOUNT + " NUMERIC, " + KEY_KOT_ORDER_BY + " TEXT,"
-            + KEY_KOT_TYPE + " TEXT," + KEY_ORDER_TYPE + " TEXT," + KEY_IS_KOT + " TEXT, " + KEY_IS_PRINTED + " TEXT, " + KEY_IS_POSTED + " TEXT, " + KEY_IS_SELECTED + " TEXT, " + KEY_CREATE_TIME + " NUMERIC);";
+            + KEY_KOT_TYPE + " TEXT," + KEY_ORDER_TYPE + " TEXT," + KEY_IS_KOT + " TEXT, " + KEY_IS_PRINTED + " TEXT, " + KEY_IS_POSTED + " TEXT, " + KEY_IS_SELECTED + " TEXT, " + KEY_CREATE_TIME + " NUMERIC, " + KEY_COVERS_DETAILS + " TEXT);";
 
     //create query for TABLE_KOT_LINES
     private static final String KOT_LINE_ITEM_CREATE_QUERY = "CREATE TABLE "
@@ -316,9 +316,16 @@ public class DBHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
         if (oldVersion < newVersion) {
+            db.execSQL("DROP TABLE IF EXISTS '" + TABLE_KOT_HEADER + "'");
+            db.execSQL("DROP TABLE IF EXISTS '" + TABLE_KOT_TABLE + "'");
+
+            db.execSQL(KOT_HEADER_CREATE_QUERY);
+            db.execSQL(KOT_TABLES_CREATE_QUERY);
+            /*
             db.execSQL("ALTER TABLE " + TABLE_KOT_HEADER + " ADD COLUMN " + KEY_COVERS_DETAILS + " TEXT");
             db.execSQL("ALTER TABLE " + TABLE_KOT_TABLE + " ADD COLUMN " + KEY_IS_COVERS_LEVEL + " TEXT");
             db.execSQL("ALTER TABLE " + TABLE_KOT_TABLE + " ADD COLUMN " + KEY_M_TABLE_GROUP_ID + " NUMERIC");
+            */
         }
     }
 
